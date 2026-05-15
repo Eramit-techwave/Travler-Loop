@@ -1,83 +1,60 @@
 const Trip = require('../models/Trip');
 
-// 1. Naya Trip banana
+// ── CREATE NEW TRIP ──
 exports.createTrip = async (req, res) => {
     try {
-        const { userId, tripName, startDate, endDate, description } = req.body;
-        const newTrip = await Trip.create({ userId, tripName, startDate, endDate, description });
-        res.status(201).json({ status: 'success', data: newTrip });
-    } catch (err) {
-        res.status(400).json({ status: 'fail', message: err.message });
+        // Frontend se aane wala data nikalna
+        const { tripName, startDate, endDate, description, totalBudget } = req.body;
+
+        // Validation: Check if the request has a user from 'protect' middleware
+        if (!req.user || !req.user._id) {
+            return res.status(401).json({ 
+                success: false, 
+                message: "Authentication failed: User information not found." 
+            });
+        }
+
+        // Creating the document matching your schema
+        const newTrip = await Trip.create({
+            userId: req.user._id, // Matching your schema's 'userId' field
+            tripName,
+            startDate,
+            endDate: endDate || startDate, // Fallback if endDate is not provided
+            description,
+            totalBudget: totalBudget || 0,
+            stops: [] // Initialized as an empty array as per your schema
+        });
+
+        res.status(201).json({
+            success: true,
+            message: "Success: Itinerary has been successfully created.",
+            data: newTrip
+        });
+
+    } catch (error) {
+        console.error("Internal Server Error:", error.message);
+        res.status(500).json({
+            success: false,
+            message: `Execution Error: ${error.message}`
+        });
     }
 };
 
-// 2. Stop add karna
-exports.addStop = async (req, res) => {
-    try {
-        const { tripId } = req.params;
-        const { city, arrivalDate, duration, activities } = req.body;
-        const trip = await Trip.findByIdAndUpdate(
-            tripId,
-            { $push: { stops: { city, arrivalDate, duration, activities } } },
-            { new: true }
-        );
-        res.status(200).json({ status: 'success', data: trip });
-    } catch (err) {
-        res.status(400).json({ status: 'fail', message: err.message });
-    }
-};
-
-// 3. User ki trips dikhana
+// ── FETCH USER TRIPS ──
 exports.getMyTrips = async (req, res) => {
     try {
-        const { userId } = req.params;
-        const trips = await Trip.find({ userId });
-        res.status(200).json({ status: 'success', data: trips });
-    } catch (err) {
-        res.status(400).json({ status: 'fail', message: err.message });
-    }
-};
-
-// 4. Budget Calculation (Checklist Point 9)
-exports.getBudgetBreakdown = async (req, res) => {
-    try {
-        const { tripId } = req.params;
-        const trip = await Trip.findById(tripId);
-        if (!trip) return res.status(404).json({ message: "Trip nahi mili" });
-
-        let totalCost = 0;
-        trip.stops.forEach(stop => {
-            stop.activities.forEach(act => { totalCost += act.cost; });
-        });
-
+        // Find all trips belonging to the logged-in user
+        const trips = await Trip.find({ userId: req.user._id }).sort({ createdAt: -1 });
+        
         res.status(200).json({
-            status: 'success',
-            tripName: trip.tripName,
-            totalEstimatedBudget: totalCost
+            success: true,
+            count: trips.length,
+            data: trips
         });
-    } catch (err) {
-        res.status(400).json({ status: 'fail', message: err.message });
-    }
-};
-// 5. Weather Info (External API Call)
-exports.getWeather = async (req, res) => {
-    try {
-        const { city } = req.params;
-        const API_KEY = "8952848b2d89d873a7488e145758432d"; // Ye meri dummy key hai testing ke liye
-        const url = `https://api.openweathermap.org/data/2.5/weather?q=${city}&appid=${API_KEY}&units=metric`;
-
-        const response = await fetch(url);
-        const data = await response.json();
-
-        if (data.cod !== 200) throw new Error(data.message);
-
-        res.status(200).json({
-            status: 'success',
-            city: data.name,
-            temp: data.main.temp,
-            description: data.weather[0].description
+    } catch (error) {
+        res.status(500).json({
+            success: false,
+            message: "Failed to retrieve itineraries."
         });
-    } catch (err) {
-        res.status(400).json({ status: 'fail', message: err.message });
     }
 };

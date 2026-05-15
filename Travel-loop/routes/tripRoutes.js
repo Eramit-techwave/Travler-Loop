@@ -1,15 +1,12 @@
 const express = require('express');
-const tripController = require('../controllers/tripController');
 const router = express.Router();
+const tripController = require('../controllers/tripController');
+const { protect } = require('../middleware/authMiddleware'); // Braces check karein
 
-router.post('/create', tripController.createTrip);
-router.get('/my-trips/:userId', tripController.getMyTrips);
-router.post('/add-stop/:tripId', tripController.addStop);
+// CREATE: POST http://localhost:5000/api/trips/add
+router.post('/add', protect, tripController.createTrip);
 
-
-// DHAYAN SE DEKHO: tripController.getBudgetBreakdown hona chahiye
-router.get('/budget/:tripId', tripController.getBudgetBreakdown);
-// Weather check karne ka rasta
-router.get('/weather/:city', tripController.getWeather);
+// FETCH: GET http://localhost:5000/api/trips/my-trips
+router.get('/my-trips', protect, tripController.getMyTrips);
 
 module.exports = router;

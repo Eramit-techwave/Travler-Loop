@@ -1,1 +1,25 @@
 @import "tailwindcss";
+
+/* ── INPUT VISIBILITY FIX ── */
+input,
+input:focus,
+input:active {
+  color: #0F172A !important;
+  -webkit-text-fill-color: #0F172A !important;
+  caret-color: #0F172A !important;
+  opacity: 1 !important;
+}
+
+input::placeholder {
+  color: #94A3B8 !important;
+  -webkit-text-fill-color: #94A3B8 !important;
+  opacity: 1 !important;
+}
+
+input:-webkit-autofill,
+input:-webkit-autofill:hover,
+input:-webkit-autofill:focus {
+  -webkit-box-shadow: 0 0 0 9999px #F8FAFC inset !important;
+  -webkit-text-fill-color: #0F172A !important;
+  caret-color: #0F172A !important;
+}

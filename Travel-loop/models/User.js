@@ -1,20 +1,20 @@
 const mongoose = require('mongoose');
 
 const userSchema = new mongoose.Schema({
-    name: {
+    username: { // 'name' ko badal kar 'username' kar diya
         type: String,
-        required: [true, "Name zaroori hai"]
+        required: [true, "Username zaroori hai"]
     },
     email: {
         type: String,
         required: [true, "Email zaroori hai"],
-        unique: true, // only one user can access by using one account
+        unique: true,
         lowercase: true
     },
     password: {
         type: String,
         required: [true, "Password zaroori hai"],
-        minlength: 6 // At least 6 characters for password for stroing security
+        minlength: 6 
     },
     createdAt: {
         type: Date,
