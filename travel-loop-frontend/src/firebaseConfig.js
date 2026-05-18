@@ -10,21 +10,14 @@ const firebaseConfig = {
   appId: "1:30915691226:web:0a7fdee3aaed1cf5bfdbe3"
 };
 
-console.log('🔵 [Firebase] Initializing with config:', firebaseConfig.projectId);
-
 const app = initializeApp(firebaseConfig);
-const auth = getAuth(app);
-const googleProvider = new GoogleAuthProvider();
 
-console.log('✅ [Firebase] Initialized successfully');
-console.log('✅ [Auth] Instance created');
-console.log('✅ [GoogleProvider] Instance created');
+export const auth = getAuth(app);
+export const googleProvider = new GoogleAuthProvider();
 
-// ── Extra scopes so Google returns display name + photo ──
+// Configure Google OAuth scopes
 googleProvider.addScope('profile');
 googleProvider.addScope('email');
-
-// ── Always show account picker ──
 googleProvider.setCustomParameters({ prompt: 'select_account' });
 
-export { auth, googleProvider, signInWithRedirect };
+export { signInWithRedirect };

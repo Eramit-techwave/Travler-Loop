@@ -1,39 +1,40 @@
 const express = require('express');
 const mongoose = require('mongoose');
-const cors = require('cors'); // Connection ke liye zaroori
+const cors = require('cors');
 require('dotenv').config();
 
-// Routes Import
 const authRoutes = require('./routes/authRoutes');
 const tripRoutes = require('./routes/tripRoutes');
 
 const app = express();
 
-// Middlewares
-// 1. CORS setup: Ye frontend aur backend ke beech ki deewar hatata hai
-app.use(cors()); 
+// Enable CORS for cross-origin requests
+app.use(cors());
 
-// 2. Body Parser: Ye frontend se aane wale JSON data ko parhne mein madad karta hai
+// Parse incoming JSON requests
 app.use(express.json());
 
-// Routes use karna
-// Ab tumhara login URL hoga: https://travler-loop.onrender.com/api/auth/login
+// API Routes
 app.use('/api/auth', authRoutes);
-app.use('/api/trips', tripRoutes); 
+app.use('/api/trips', tripRoutes);
 
-// MongoDB Connection
-// Check karna ki tumhara MongoDB Compass peeche chalu ho
+// Database Connection
 mongoose.connect('mongodb://127.0.0.1:27017/traveloopDB')
-    .then(() => console.log("✅ Database connected successfully!"))
-    .catch(err => console.log("DB Connection Error: ", err));
+    .then(() => console.log('[DB] Connected successfully'))
+    .catch(err => console.error('[DB] Connection failed:', err));
 
-// Basic Test Route
+// Health check endpoint
 app.get('/', (req, res) => {
-    res.send("Traveloop Backend is Flying High!");
+    res.json({ status: 'Server is running', timestamp: new Date() });
 });
 
-// Port Setting
+// Error handling middleware
+app.use((err, req, res, next) => {
+    console.error('[Error]', err);
+    res.status(500).json({ success: false, message: 'Internal server error' });
+});
+
 const PORT = process.env.PORT || 5000;
 app.listen(PORT, () => {
-    console.log(`🚀 Server is flying on port ${PORT}`);
+    console.log(`[Server] Running on port ${PORT}`);
 });

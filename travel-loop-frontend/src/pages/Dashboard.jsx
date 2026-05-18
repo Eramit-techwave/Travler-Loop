@@ -38,7 +38,7 @@ const Dashboard = () => {
       const token = localStorage.getItem('token');
       if (!token) return;
 
-      const response = await axios.get('https://travler-loop.onrender.com/api/trips/my-trips', {
+      const response = await axios.get('http://localhost:5000/api/trips/my-trips', {
         headers: { Authorization: `Bearer ${token}` }
       });
       
@@ -46,7 +46,7 @@ const Dashboard = () => {
         setMyTrips(response.data.data);
       }
     } catch (error) {
-      console.error("Error fetching trips:", error);
+      console.error('[Trips] Fetch error:', error);
     }
   }, []);
 
@@ -79,28 +79,29 @@ const Dashboard = () => {
     try {
       const token = localStorage.getItem('token');
       
-      // ── 2. DYNAMIC PAYLOAD ──
       const tripPayload = {
         tripName: bookingData.destination,
         startDate: bookingData.startDate,
         endDate: bookingData.startDate,
-        description: `Trip for ${bookingData.travelers}`, // Dynamic travelers text
+        description: `Trip for ${bookingData.travelers}`,
         stops: [],
-        totalBudget: Number(bookingData.budget) || 0 // Dynamic Budget from input
+        totalBudget: Number(bookingData.budget) || 0
       };
 
-      const response = await axios.post('https://travler-loop.onrender.com/api/trips/add', tripPayload, {
+      const response = await axios.post('http://localhost:5000/api/trips/add', tripPayload, {
         headers: { Authorization: `Bearer ${token}` }
       });
 
       if (response.data.success || response.status === 201) {
-        alert(`🚀 Success! Trip to ${bookingData.destination} is scheduled.`);
-        // Resetting form including budget
+        alert(`Trip to ${bookingData.destination} created successfully`);
         setBookingData({ destination: '', startDate: '', travelers: '1 Person', budget: '' });
         fetchMyTrips(); 
+      } else {
+        alert(response.data.message || 'Booking failed');
       }
     } catch (error) {
-      alert(error.response?.data?.message || "Booking Failed! Check Backend.");
+      console.error('[Trips] Booking error:', error);
+      alert(error.response?.data?.message || 'Booking failed. Please try again.');
     } finally {
       setIsLoading(false);
     }

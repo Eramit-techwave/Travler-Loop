@@ -105,29 +105,20 @@ const Login = () => {
 
   useEffect(() => { injectGlobals(); }, []);
 
-  // Handle redirect result after Google sign-in
+  // Handle Google OAuth redirect result
   useEffect(() => {
     const handleRedirectResult = async () => {
       try {
-        console.log('🔵 [Redirect] Checking for redirect result...');
         const result = await getRedirectResult(auth);
         
-        if (!result?.user) {
-          console.log('ℹ️ [Redirect] No result (normal page load)');
-          return;
-        }
+        if (!result?.user) return;
 
-        console.log('✅ [Redirect] Got Firebase result for:', result.user.email);
         const user = result.user;
-
-        console.log('🔵 [Redirect] Calling backend /api/auth/google...');
-        const response = await axios.post('https://travler-loop.onrender.com/api/auth/google', {
+        const response = await axios.post('http://localhost:5000/api/auth/google', {
           username: user.displayName,
           email: user.email,
           profilePic: user.photoURL,
         });
-
-        console.log('✅ [Redirect] Backend response:', response.data);
 
         if (response.data.success) {
           localStorage.setItem('token', response.data.token);
@@ -135,13 +126,12 @@ const Login = () => {
             ...response.data.user,
             profilePic: user.photoURL,
           }));
-          console.log('✅ [Redirect] Redirecting to dashboard...');
           navigate('/dashboard');
         } else {
-          throw new Error(response.data.message || 'Backend login failed');
+          throw new Error(response.data.message || 'Login failed');
         }
       } catch (error) {
-        console.error('❌ [Redirect] Error:', error);
+        console.error('[Auth] Google login error:', error);
       }
     };
 
@@ -161,53 +151,60 @@ const Login = () => {
     setTimeout(() => { setCurSlide(idx); setPrevSlide(null); setInTrans(false); }, 800);
   };
 
-  // ── LOGIC 1: EMAIL LOGIN ──
+  // Email/Password Login
   const handleLogin = async (e) => {
     e.preventDefault();
+    
+    if (!email || !password) {
+      alert('Please enter email and password');
+      return;
+    }
+
     setIsLoading(true);
     try {
-      const res = await axios.post('https://travler-loop.onrender.com/api/auth/login', { email, password });
+      const res = await axios.post('http://localhost:5000/api/auth/login', { email, password });
       if (res.data.success) {
         localStorage.setItem('token', res.data.token);
         localStorage.setItem('user', JSON.stringify(res.data.user));
         setTimeout(() => navigate('/dashboard'), 800);
+      } else {
+        alert(res.data.message || 'Login failed');
       }
     } catch (err) {
-      alert(err.response?.data?.message || 'Invalid Credentials! Passport check failed.');
+      console.error('[Auth] Login error:', err);
+      alert(err.response?.data?.message || 'Invalid email or password');
     } finally {
       setIsLoading(false);
     }
   };
 
-  // ── LOGIC 2: GOOGLE LOGIN (REDIRECT) ──
-  // Using redirect instead of popup - works even with popup blockers
+  // ── GOOGLE OAUTH LOGIN ──
   const handleGoogleLogin = async () => {
     try {
-      console.log('🔵 [Google] Starting sign-in redirect...');
       await signInWithRedirect(auth, googleProvider);
     } catch (error) {
-      console.error('❌ [Google] Error:', error);
-      alert(`Google Sign-In Error: ${error.message}`);
+      console.error('[Auth] Google sign-in error:', error);
+      alert('Google sign-in failed. Please try again.');
     }
   };
 
-  // ── LOGIC 3: FORGOT PASSWORD ──
+  // Password Reset
   const handleForgotPassword = async (e) => {
     e.preventDefault();
-    const resetEmail = prompt('Enter your registered email to receive a recovery link:');
+    const resetEmail = prompt('Enter your registered email:');
     if (!resetEmail) return;
     try {
       await sendPasswordResetEmail(auth, resetEmail);
-      alert('🚀 Recovery link sent! Check your inbox to reset your Security Key.');
+      alert('Password reset link sent to your email');
     } catch (error) {
-      console.error('Reset Error:', error);
-      alert('❌ Error: Could not initiate recovery. Ensure the email is correct.');
+      console.error('[Auth] Password reset error:', error);
+      alert('Password reset failed. Please try again.');
     }
   };
 
-  // ── LOGIC 4: COMING SOON ALERT FIX ──
+  // Coming Soon Alert
   const handleComingSoon = (platform) => {
-    alert(`Standby! ${platform} integration is coming in the next update. 🛠️`);
+    alert(`${platform} integration is coming in the next update`);
   };
 
   const cur  = SLIDES[curSlide];
