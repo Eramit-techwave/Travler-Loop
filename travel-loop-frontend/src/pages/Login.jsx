@@ -1,229 +1,494 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
-import { Plane, Mail, Lock, ArrowRight, Github, Chrome, ArrowLeft, Facebook, Apple } from 'lucide-react';
+import { Plane, Mail, Lock, ArrowRight, ArrowLeft, Github, Facebook } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 
 // ── FIREBASE IMPORTS ──
 import { auth, googleProvider, signInWithPopup } from '../firebaseConfig';
-import { sendPasswordResetEmail } from "firebase/auth";
+import { getRedirectResult, sendPasswordResetEmail, signInWithRedirect } from 'firebase/auth';
 
+/* ══════════════════════════════════════════
+   GLOBAL STYLES
+══════════════════════════════════════════ */
+const injectGlobals = () => {
+  if (document.getElementById('login-globals')) return;
+
+  const font = document.createElement('link');
+  font.rel  = 'stylesheet';
+  font.href = 'https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,600;0,700;1,600&family=DM+Sans:wght@300;400;500;600&display=swap';
+  document.head.appendChild(font);
+
+  const style = document.createElement('style');
+  style.id = 'login-globals';
+  style.textContent = `
+    /* ── Input text always visible ── */
+    .login-input {
+      color: #0f172a !important;
+      -webkit-text-fill-color: #0f172a !important;
+      caret-color: #2563eb !important;
+      font-family: 'DM Sans', sans-serif !important;
+      font-size: 14px !important;
+      font-weight: 400 !important;
+    }
+    .login-input::placeholder {
+      color: #94a3b8 !important;
+      -webkit-text-fill-color: #94a3b8 !important;
+      opacity: 1 !important;
+    }
+    .login-input:-webkit-autofill,
+    .login-input:-webkit-autofill:hover,
+    .login-input:-webkit-autofill:focus {
+      -webkit-box-shadow: 0 0 0 9999px #f8faff inset !important;
+      -webkit-text-fill-color: #0f172a !important;
+    }
+
+    /* ── Ken Burns per slide ── */
+    @keyframes kb0 { from { transform: scale(1.00) translate(0,0); } to { transform: scale(1.10) translate(-15px,-8px); } }
+    @keyframes kb1 { from { transform: scale(1.00) translate(0,0); } to { transform: scale(1.10) translate(12px,-10px); } }
+    @keyframes kb2 { from { transform: scale(1.00) translate(0,0); } to { transform: scale(1.10) translate(-10px,8px); } }
+    @keyframes kb3 { from { transform: scale(1.00) translate(0,0); } to { transform: scale(1.12) translate(8px,-12px); } }
+    .kb0 { animation: kb0 8s ease-in-out infinite alternate; }
+    .kb1 { animation: kb1 8s ease-in-out infinite alternate; }
+    .kb2 { animation: kb2 8s ease-in-out infinite alternate; }
+    .kb3 { animation: kb3 8s ease-in-out infinite alternate; }
+
+    @keyframes form-up { from { opacity:0; transform:translateY(18px); } to { opacity:1; transform:translateY(0); } }
+    .form-up { animation: form-up 0.5s cubic-bezier(0.22,1,0.36,1) both; }
+
+    @keyframes dot-pulse { 0%,100% { box-shadow:0 0 0 0 rgba(37,99,235,0.45); } 50% { box-shadow:0 0 0 6px rgba(37,99,235,0); } }
+    .dot-pulse { animation: dot-pulse 1.8s ease-out infinite; }
+
+    @keyframes shimmer { 0% { background-position:-200% center; } 100% { background-position:200% center; } }
+    .btn-shimmer {
+      background: linear-gradient(90deg, #1e40af 0%, #2563eb 40%, #1e40af 100%);
+      background-size: 200% auto;
+      animation: shimmer 3s linear infinite;
+    }
+
+    .social-btn { transition: all .2s !important; }
+    .social-btn:hover { background:#eff6ff !important; border-color:#bfdbfe !important; }
+  `;
+  document.head.appendChild(style);
+};
+
+/* ══════════════════════════════════════════
+   SLIDES
+══════════════════════════════════════════ */
+const SLIDES = [
+  { url:'https://images.unsplash.com/photo-1527631746610-bca00a040d60?q=80&w=1200&auto=format', tag:'FIRST CLASS', line1:'The World',    line2:'Is Waiting.',   sub:'Premium travel for the discerning explorer.', kb:'kb0' },
+  { url:'https://images.unsplash.com/photo-1506929113675-b9299d39bb14?q=80&w=1200&auto=format', tag:'ADVENTURE',   line1:'Find Your',     line2:'Next Story.',    sub:'Off-the-beaten-path destinations.',           kb:'kb1' },
+  { url:'https://images.unsplash.com/photo-1476514525535-07fb3b4ae5f1?q=80&w=1200&auto=format', tag:'ESCAPE',      line1:'Escape The',    line2:'Ordinary.',      sub:'Every journey starts with one booking.',      kb:'kb2' },
+  { url:'https://images.unsplash.com/photo-1503220317375-aaad61436b1b?q=80&w=1200&auto=format', tag:'DISCOVER',    line1:'Explore',       line2:'Hidden Gems.',   sub:'Curated routes to places maps forget.',       kb:'kb3' },
+];
+
+/* ══════════════════════════════════════════
+   ICONS
+══════════════════════════════════════════ */
+const GoogleIcon = () => (
+  <svg width="18" height="18" viewBox="0 0 24 24" fill="none">
+    <path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" fill="#4285F4"/>
+    <path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" fill="#34A853"/>
+    <path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l3.66-2.84z" fill="#FBBC05"/>
+    <path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" fill="#EA4335"/>
+  </svg>
+);
+
+const AppleIcon = () => (
+  <svg width="18" height="18" viewBox="0 0 24 24" fill="#0f172a">
+    <path d="M18.71 19.5c-.83 1.24-1.71 2.45-3.05 2.47-1.34.03-1.77-.79-3.29-.79-1.53 0-2 .77-3.27.82-1.31.05-2.3-1.32-3.14-2.53C4.25 17 2.94 12.45 4.7 9.39c.87-1.52 2.43-2.48 4.12-2.51 1.28-.02 2.5.87 3.29.87.78 0 2.26-1.07 3.8-.91.65.03 2.47.26 3.64 1.98-.09.06-2.17 1.28-2.15 3.81.03 3.02 2.65 4.03 2.68 4.04-.03.07-.42 1.44-1.38 2.83M13 3.5c.73-.83 1.94-1.46 2.94-1.5.13 1.17-.34 2.35-1.04 3.19-.69.85-1.83 1.51-2.95 1.42-.15-1.15.41-2.35 1.05-3.11z"/>
+  </svg>
+);
+
+/* ══════════════════════════════════════════
+   MAIN COMPONENT
+══════════════════════════════════════════ */
 const Login = () => {
   const navigate = useNavigate();
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
+
+  const [email,     setEmail]     = useState('');
+  const [password,  setPassword]  = useState('');
   const [isLoading, setIsLoading] = useState(false);
-  
-  // ── SLIDESHOW LOGIC ──
-  const [currentSlide, setCurrentSlide] = useState(0);
-  const slides = [
-    {
-      url: "https://images.unsplash.com/photo-1527631746610-bca00a040d60?q=80&w=1200&auto=format",
-      text: "The world is waiting for you."
-    },
-    {
-      url: "https://images.unsplash.com/photo-1506929113675-b9299d39bb14?q=80&w=1200&auto=format",
-      text: "Find your next adventure."
-    },
-    {
-      url: "https://images.unsplash.com/photo-1476514525535-07fb3b4ae5f1?q=80&w=1200&auto=format",
-      text: "Escape the ordinary."
-    },
-    {
-      url: "https://images.unsplash.com/photo-1503220317375-aaad61436b1b?q=80&w=1200&auto=format",
-      text: "Explore hidden gems."
-    }
-  ];
+  const [curSlide,  setCurSlide]  = useState(0);
+  const [prevSlide, setPrevSlide] = useState(null);
+  const [inTrans,   setInTrans]   = useState(false);
+  const [focused,   setFocused]   = useState(null);
+  const [gLoading,  setGLoading]  = useState(false);
+
+  useEffect(() => { injectGlobals(); }, []);
 
   useEffect(() => {
-    const timer = setInterval(() => {
-      setCurrentSlide((prev) => (prev === slides.length - 1 ? 0 : prev + 1));
-    }, 4500); 
-    return () => clearInterval(timer);
-  }, [slides.length]);
+    const finishRedirectLogin = async () => {
+      console.log('🔵 [Google Redirect] Checking for redirect result on page load...');
+      try {
+        const result = await getRedirectResult(auth);
+        if (!result?.user) {
+          console.log('ℹ️ [Google Redirect] No redirect result found, normal page load');
+          return;
+        }
 
-  // ── LOGIC 1: NORMAL EMAIL LOGIN ──
+        console.log('✅ [Google Redirect] Found redirect result!');
+        const user = result.user;
+        console.log('✅ [Google Redirect] User data:', {
+          displayName: user.displayName,
+          email: user.email,
+          photoURL: user.photoURL,
+        });
+
+        console.log('🔵 [Google Redirect] Calling backend /api/auth/google...');
+        const response = await axios.post('http://localhost:5000/api/auth/google', {
+          username: user.displayName,
+          email: user.email,
+          profilePic: user.photoURL,
+        });
+
+        console.log('✅ [Google Redirect] Backend response:', response.data);
+
+        if (!response.data.success) {
+          throw new Error(response.data.message || 'Google login failed');
+        }
+
+        localStorage.setItem('token', response.data.token);
+        localStorage.setItem('user', JSON.stringify({
+          ...response.data.user,
+          profilePic: user.photoURL,
+        }));
+        console.log('✅ [Google Redirect] Navigating to /dashboard...');
+        navigate('/dashboard');
+      } catch (error) {
+        console.error('❌ [Google Redirect] Error:', error);
+      }
+    };
+
+    finishRedirectLogin();
+  }, [navigate]);
+
+  // Auto-advance
+  useEffect(() => {
+    const t = setInterval(() => goTo((curSlide + 1) % SLIDES.length), 4500);
+    return () => clearInterval(t);
+  }, [curSlide, inTrans]);
+
+  const goTo = (idx) => {
+    if (inTrans || idx === curSlide) return;
+    setPrevSlide(curSlide);
+    setInTrans(true);
+    setTimeout(() => { setCurSlide(idx); setPrevSlide(null); setInTrans(false); }, 800);
+  };
+
+  // ── LOGIC 1: EMAIL LOGIN — UNTOUCHED ──
   const handleLogin = async (e) => {
     e.preventDefault();
     setIsLoading(true);
     try {
-      const response = await axios.post('http://localhost:5000/api/auth/login', {
-        email: email,
-        password: password
-      });
-
-      if (response.data.success) {
-        localStorage.setItem('token', response.data.token);
-        localStorage.setItem('user', JSON.stringify(response.data.user));
-        
-        setTimeout(() => {
-          navigate('/dashboard');
-        }, 800);
+      const res = await axios.post('http://localhost:5000/api/auth/login', { email, password });
+      if (res.data.success) {
+        localStorage.setItem('token', res.data.token);
+        localStorage.setItem('user', JSON.stringify(res.data.user));
+        setTimeout(() => navigate('/dashboard'), 800);
       }
-    } catch (error) {
-      alert(error.response?.data?.message || "Invalid Credentials! Passport check failed.");
+    } catch (err) {
+      alert(err.response?.data?.message || 'Invalid Credentials! Passport check failed.');
     } finally {
       setIsLoading(false);
     }
   };
 
-  // ── LOGIC 2: GOOGLE LOGIN (WORKING) ──
-  const handleGoogleLogin = async () => {
-    try {
-      const result = await signInWithPopup(auth, googleProvider);
-      const user = result.user;
-
-      const userData = {
-        username: user.displayName,
-        email: user.email,
-        profilePic: user.photoURL
-      };
-
-      localStorage.setItem('token', user.accessToken);
-      localStorage.setItem('user', JSON.stringify(userData));
-
-      alert(`Welcome ${user.displayName}! Ready for Takeoff 🚀`);
-      navigate('/dashboard');
-    } catch (error) {
-      console.error("Google Auth Error:", error);
-      alert("Google Sign-in failed! Try again later.");
+  // ── LOGIC 2: GOOGLE LOGIN ──
+  // Firebase handles the popup, then the backend issues the app JWT.
+  const handleGoogleLogin = () => {
+    console.log('🔵 [Google Login] Button clicked');
+    if (gLoading) {
+      console.warn('⚠️ [Google Login] Already loading, skipping');
+      return;
     }
+    setGLoading(true);
+
+    console.log('🔵 [Google Login] Starting signInWithPopup...');
+    signInWithPopup(auth, googleProvider)
+      .then(async (result) => {
+        console.log('✅ [Google Login] Firebase popup success');
+        const user = result.user;
+        console.log('✅ [Google Login] User data:', {
+          displayName: user.displayName,
+          email: user.email,
+          photoURL: user.photoURL,
+        });
+
+        console.log('🔵 [Google Login] Calling backend /api/auth/google...');
+        const response = await axios.post('http://localhost:5000/api/auth/google', {
+          username: user.displayName,
+          email: user.email,
+          profilePic: user.photoURL,
+        });
+
+        console.log('✅ [Google Login] Backend response:', response.data);
+
+        if (!response.data.success) {
+          throw new Error(response.data.message || 'Google login failed');
+        }
+
+        console.log('✅ [Google Login] Backend success confirmed');
+        localStorage.setItem('token', response.data.token);
+        localStorage.setItem('user', JSON.stringify({
+          ...response.data.user,
+          profilePic: user.photoURL,
+        }));
+        console.log('✅ [Google Login] Token stored in localStorage');
+        alert(`Welcome ${user.displayName}! Ready for Takeoff 🚀`);
+        console.log('🔵 [Google Login] Navigating to /dashboard...');
+        navigate('/dashboard');
+      })
+      .catch((error) => {
+        console.error('❌ [Google Login] Error caught:', {
+          code: error.code,
+          message: error.message,
+          fullError: error,
+        });
+
+        if (error.code === 'auth/popup-closed-by-user' ||
+            error.code === 'auth/cancelled-popup-request') {
+          console.log('ℹ️ [Google Login] User closed popup, no action needed');
+          return;
+        }
+
+        if (error.code === 'auth/popup-blocked' ||
+            error.code === 'auth/operation-not-supported-in-this-environment' ||
+            error.code === 'auth/unauthorized-domain') {
+          console.log('⚠️ [Google Login] Popup blocked/unsupported, falling back to redirect...');
+          signInWithRedirect(auth, googleProvider);
+          return;
+        }
+
+        console.error('🔴 [Google Login] Unhandled error:', error);
+        alert(`Google Login Error: ${error.message}`);
+      })
+      .finally(() => {
+        console.log('🔵 [Google Login] Finally block - clearing loading state');
+        setGLoading(false);
+      });
   };
 
-  // ── LOGIC 3: FORGOT PASSWORD (WORKING) ──
-  const handleForgotPassword = async () => {
-    const resetEmail = prompt("Enter your registered email to receive a recovery link:");
-    
+  // ── LOGIC 3: FORGOT PASSWORD — UNTOUCHED ──
+  const handleForgotPassword = async (e) => {
+    e.preventDefault();
+    const resetEmail = prompt('Enter your registered email to receive a recovery link:');
     if (!resetEmail) return;
-
     try {
       await sendPasswordResetEmail(auth, resetEmail);
-      alert("🚀 Recovery link sent! Check your inbox to reset your Security Key.");
+      alert('🚀 Recovery link sent! Check your inbox to reset your Security Key.');
     } catch (error) {
-      console.error("Reset Error:", error);
-      alert("❌ Error: Could not initiate recovery. Ensure the email is correct.");
+      console.error('Reset Error:', error);
+      alert('❌ Error: Could not initiate recovery. Ensure the email is correct.');
     }
   };
 
-  // ── LOGIC 4: COMING SOON ALERT ──
-  const handleComingSoon = (platform) => {
+  const handleComingSoon = (platform) =>
     alert(`Standby! ${platform} integration is coming in the next update.`);
-  };
 
+  const cur  = SLIDES[curSlide];
+  const prev = prevSlide !== null ? SLIDES[prevSlide] : null;
+
+  const inputSt = (fid) => ({
+    width: '100%',
+    boxSizing: 'border-box',
+    padding: '14px 14px 14px 48px',
+    background: focused === fid ? '#ffffff' : '#f8faff',
+    border: `1.5px solid ${focused === fid ? '#2563eb' : '#e2e8f0'}`,
+    borderRadius: '14px',
+    outline: 'none',
+    boxShadow: focused === fid ? '0 0 0 3px rgba(37,99,235,0.12)' : 'none',
+    transition: 'border-color .2s, background .2s, box-shadow .2s',
+  });
+
+  /* ══ RENDER ══ */
   return (
-    <div className="min-h-screen bg-slate-50 flex items-center justify-center p-4 md:p-6 font-sans relative overflow-hidden">
-      
-      {/* Background Blobs */}
-      <div className="absolute top-[-10%] left-[-10%] w-[40%] h-[40%] bg-blue-100 rounded-full blur-[120px] opacity-40"></div>
-      <div className="absolute bottom-[-10%] right-[-10%] w-[40%] h-[40%] bg-blue-200 rounded-full blur-[120px] opacity-40"></div>
+    <div style={{ minHeight:'100vh', background:'#f0f4ff', display:'flex', alignItems:'center', justifyContent:'center', padding:'20px', fontFamily:"'DM Sans', sans-serif", position:'relative', overflow:'hidden' }}>
 
-      {/* Back Button */}
-      <button 
+      {/* Blobs */}
+      <div style={{ position:'fixed', top:'-10%', left:'-10%', width:'40%', height:'40%', background:'rgba(191,219,254,0.4)', borderRadius:'50%', filter:'blur(80px)', pointerEvents:'none' }} />
+      <div style={{ position:'fixed', bottom:'-10%', right:'-10%', width:'40%', height:'40%', background:'rgba(199,210,254,0.4)', borderRadius:'50%', filter:'blur(80px)', pointerEvents:'none' }} />
+
+      {/* Back */}
+      <button
         onClick={() => navigate('/')}
-        className="absolute top-6 left-6 z-30 flex items-center gap-2 text-gray-400 font-black text-[10px] tracking-[2px] hover:text-blue-700 transition-all group"
+        style={{ position:'fixed', top:'24px', left:'24px', zIndex:100, background:'rgba(255,255,255,0.9)', backdropFilter:'blur(8px)', border:'1px solid #e2e8f0', borderRadius:'100px', padding:'8px 16px 8px 12px', cursor:'pointer', display:'flex', alignItems:'center', gap:'6px', color:'#64748b', fontSize:'10px', fontWeight:'600', letterSpacing:'.14em', textTransform:'uppercase', fontFamily:"'DM Sans', sans-serif", boxShadow:'0 2px 8px rgba(0,0,0,0.08)' }}
       >
-        <ArrowLeft size={18} className="group-hover:-translate-x-1 transition" /> BACK TO EXPLORE
+        <ArrowLeft size={14} /> Back to Explore
       </button>
 
-      <div className="w-full max-w-[1150px] min-h-[700px] grid grid-cols-1 lg:grid-cols-2 bg-white rounded-[40px] shadow-2xl overflow-hidden relative z-10 border border-white">
-        
-        {/* Animated Slideshow */}
-        <div className="hidden lg:block relative overflow-hidden bg-slate-900">
-          {slides.map((slide, index) => (
-            <div
-              key={index}
-              className={`absolute inset-0 transition-all duration-1000 ease-in-out transform ${
-                index === currentSlide ? "opacity-100 scale-100" : "opacity-0 scale-110"
-              }`}
-            >
-              <img src={slide.url} className="h-full w-full object-cover" alt="Destination" />
-              <div className="absolute inset-0 bg-gradient-to-t from-blue-950/90 via-transparent flex flex-col justify-end p-16">
-                <h2 className="text-5xl font-black text-white leading-tight uppercase italic">{slide.text}</h2>
-                <div className="flex gap-3 mt-8">
-                  {slides.map((_, i) => (
-                    <div key={i} className={`h-1.5 rounded-full transition-all duration-500 ${i === currentSlide ? "w-12 bg-blue-500" : "w-3 bg-white/30"}`}></div>
-                  ))}
+      {/* Card */}
+      <div style={{ position:'relative', zIndex:1, width:'100%', maxWidth:'1150px', minHeight:'700px', display:'grid', gridTemplateColumns:'1fr 1fr', borderRadius:'32px', overflow:'hidden', boxShadow:'0 40px 80px rgba(0,0,0,0.18)', background:'#fff' }}>
+
+        {/* ══ LEFT — SLIDESHOW ══ */}
+        <div style={{ position:'relative', overflow:'hidden', background:'#0f172a' }}>
+
+          {/* Outgoing */}
+          {prev && (
+            <div style={{ position:'absolute', inset:0, zIndex:1, opacity: inTrans ? 0 : 1, transition:'opacity .8s ease' }}>
+              <img src={prev.url} alt="" style={{ width:'100%', height:'100%', objectFit:'cover' }} />
+            </div>
+          )}
+
+          {/* Current + Ken Burns */}
+          <div style={{ position:'absolute', inset:0, zIndex:2, overflow:'hidden' }}>
+            <img
+              key={curSlide}
+              src={cur.url}
+              alt="Destination"
+              className={cur.kb}
+              style={{ width:'100%', height:'100%', objectFit:'cover', transformOrigin:'center center' }}
+            />
+          </div>
+
+          {/* Gradient */}
+          <div style={{ position:'absolute', inset:0, zIndex:3, background:'linear-gradient(to top, rgba(10,20,60,0.92) 0%, rgba(10,20,60,0.25) 55%, rgba(10,20,60,0.10) 100%)' }} />
+
+          {/* Text */}
+          <div style={{ position:'absolute', inset:0, zIndex:4, padding:'52px 48px', display:'flex', flexDirection:'column', justifyContent:'flex-end' }}>
+            <div style={{ display:'inline-flex', alignItems:'center', padding:'4px 12px', borderRadius:'100px', border:'1px solid rgba(255,255,255,0.22)', background:'rgba(255,255,255,0.08)', backdropFilter:'blur(4px)', marginBottom:'16px', width:'fit-content' }}>
+              <span style={{ fontSize:'9px', fontWeight:'700', letterSpacing:'.2em', color:'#93c5fd' }}>{cur.tag}</span>
+            </div>
+            <h2 style={{ fontFamily:"'Cormorant Garamond', serif", fontSize:'58px', fontWeight:'600', fontStyle:'italic', color:'#f8fafc', lineHeight:'.90', letterSpacing:'-.02em', marginBottom:'14px' }}>
+              {cur.line1}<br />
+              <span style={{ color:'#60a5fa' }}>{cur.line2}</span>
+            </h2>
+            <p style={{ color:'rgba(248,250,252,0.50)', fontSize:'13px', fontWeight:'300', lineHeight:'1.6', maxWidth:'280px', marginBottom:'32px' }}>
+              {cur.sub}
+            </p>
+            {/* Dots */}
+            <div style={{ display:'flex', gap:'8px', alignItems:'center' }}>
+              {SLIDES.map((_, i) => (
+                <button
+                  key={i}
+                  onClick={() => goTo(i)}
+                  className={i === curSlide ? 'dot-pulse' : ''}
+                  style={{ width: i === curSlide ? '28px' : '7px', height:'7px', borderRadius:'100px', background: i === curSlide ? '#3b82f6' : 'rgba(255,255,255,0.28)', border:'none', cursor:'pointer', padding:0, transition:'all .4s cubic-bezier(0.34,1.56,0.64,1)' }}
+                />
+              ))}
+            </div>
+          </div>
+        </div>
+
+        {/* ══ RIGHT — FORM ══ */}
+        <div style={{ padding:'52px 56px', display:'flex', flexDirection:'column', justifyContent:'center', background:'#ffffff', overflowY:'auto' }}>
+          <div className="form-up">
+
+            {/* Logo */}
+            <div style={{ display:'flex', alignItems:'center', gap:'10px', marginBottom:'40px' }}>
+              <div style={{ width:'36px', height:'36px', borderRadius:'10px', background:'linear-gradient(135deg,#1e3a8a,#2563eb)', display:'flex', alignItems:'center', justifyContent:'center' }}>
+                <Plane size={17} color="#fff" style={{ transform:'rotate(45deg)' }} />
+              </div>
+              <span style={{ fontFamily:"'Cormorant Garamond', serif", fontSize:'20px', fontWeight:'700', color:'#1e3a8a', letterSpacing:'.04em' }}>Traveloop</span>
+            </div>
+
+            {/* Heading */}
+            <div style={{ marginBottom:'28px' }}>
+              <p style={{ fontSize:'10px', fontWeight:'600', letterSpacing:'.22em', textTransform:'uppercase', color:'#2563eb', marginBottom:'8px' }}>Welcome back, Traveler</p>
+              <h3 style={{ fontFamily:"'Cormorant Garamond', serif", fontSize:'40px', fontWeight:'700', color:'#0f172a', lineHeight:'1', margin:0 }}>
+                Confirm Your<br />Booking
+              </h3>
+            </div>
+
+            {/* Form */}
+            <form onSubmit={handleLogin} style={{ display:'flex', flexDirection:'column', gap:'14px' }}>
+
+              {/* Email */}
+              <div>
+                <label style={{ display:'block', fontSize:'10px', fontWeight:'600', letterSpacing:'.18em', textTransform:'uppercase', color:'#94a3b8', marginBottom:'6px' }}>Email Address</label>
+                <div style={{ position:'relative' }}>
+                  <Mail size={16} style={{ position:'absolute', left:'14px', top:'50%', transform:'translateY(-50%)', color: focused==='email' ? '#2563eb' : '#cbd5e1', transition:'color .2s', pointerEvents:'none' }} />
+                  <input
+                    required type="email" value={email}
+                    placeholder="Enter registered email"
+                    onChange={e => setEmail(e.target.value)}
+                    onFocus={() => setFocused('email')}
+                    onBlur={() => setFocused(null)}
+                    className="login-input"
+                    style={inputSt('email')}
+                  />
                 </div>
               </div>
+
+              {/* Password */}
+              <div>
+                <div style={{ display:'flex', justifyContent:'space-between', marginBottom:'6px' }}>
+                  <label style={{ fontSize:'10px', fontWeight:'600', letterSpacing:'.18em', textTransform:'uppercase', color:'#94a3b8' }}>Security Key</label>
+                  <button type="button" onClick={handleForgotPassword} style={{ fontSize:'10px', fontWeight:'600', color:'#2563eb', background:'none', border:'none', cursor:'pointer', letterSpacing:'.1em', textTransform:'uppercase', fontFamily:"'DM Sans', sans-serif" }}>Forgot?</button>
+                </div>
+                <div style={{ position:'relative' }}>
+                  <Lock size={16} style={{ position:'absolute', left:'14px', top:'50%', transform:'translateY(-50%)', color: focused==='pass' ? '#2563eb' : '#cbd5e1', transition:'color .2s', pointerEvents:'none' }} />
+                  <input
+                    required type="password" value={password}
+                    placeholder="••••••••"
+                    onChange={e => setPassword(e.target.value)}
+                    onFocus={() => setFocused('pass')}
+                    onBlur={() => setFocused(null)}
+                    className="login-input"
+                    style={inputSt('pass')}
+                  />
+                </div>
+              </div>
+
+              {/* Submit */}
+              <button
+                type="submit" disabled={isLoading}
+                className="btn-shimmer"
+                style={{ width:'100%', padding:'15px', border:'none', borderRadius:'14px', color:'#fff', fontFamily:"'DM Sans', sans-serif", fontSize:'12px', fontWeight:'600', letterSpacing:'.14em', textTransform:'uppercase', cursor: isLoading ? 'not-allowed' : 'pointer', opacity: isLoading ? .65 : 1, display:'flex', alignItems:'center', justifyContent:'center', gap:'8px', marginTop:'4px' }}
+                onMouseEnter={e => { if(!isLoading) e.currentTarget.style.transform='translateY(-1px)'; }}
+                onMouseLeave={e => { e.currentTarget.style.transform='none'; }}
+              >
+                {isLoading ? 'Checking Clearance…' : 'Initiate Takeoff'} <ArrowRight size={16} />
+              </button>
+            </form>
+
+            {/* Divider */}
+            <div style={{ display:'flex', alignItems:'center', gap:'12px', margin:'22px 0' }}>
+              <hr style={{ flex:1, border:'none', borderTop:'1px solid #f1f5f9' }} />
+              <span style={{ fontSize:'10px', fontWeight:'600', letterSpacing:'.18em', textTransform:'uppercase', color:'#cbd5e1' }}>Gate Entry</span>
+              <hr style={{ flex:1, border:'none', borderTop:'1px solid #f1f5f9' }} />
             </div>
-          ))}
+
+            {/* Social — 2x2 grid */}
+            <div style={{ display:'grid', gridTemplateColumns:'1fr 1fr', gap:'10px' }}>
+
+              {/* ✅ GOOGLE — WORKING */}
+              <button
+                type="button"
+                onClick={handleGoogleLogin}
+                disabled={gLoading}
+                className="social-btn"
+                style={{ display:'flex', alignItems:'center', justifyContent:'center', gap:'8px', padding:'13px', border:'1.5px solid #e2e8f0', borderRadius:'14px', background:'#fff', cursor: gLoading ? 'not-allowed' : 'pointer', fontFamily:"'DM Sans', sans-serif", fontSize:'13px', fontWeight:'600', color:'#374151', opacity: gLoading ? .65 : 1 }}
+              >
+                <GoogleIcon /> {gLoading ? 'Opening…' : 'Google'}
+              </button>
+
+              {/* GITHUB — coming soon */}
+              <button type="button" onClick={() => handleComingSoon('Github')} className="social-btn" style={{ display:'flex', alignItems:'center', justifyContent:'center', gap:'8px', padding:'13px', border:'1.5px solid #e2e8f0', borderRadius:'14px', background:'#fff', cursor:'pointer', fontFamily:"'DM Sans', sans-serif", fontSize:'13px', fontWeight:'600', color:'#374151' }}>
+                <Github size={18} /> Github
+              </button>
+
+              {/* FACEBOOK — coming soon */}
+              <button type="button" onClick={() => handleComingSoon('Facebook')} className="social-btn" style={{ display:'flex', alignItems:'center', justifyContent:'center', gap:'8px', padding:'13px', border:'1.5px solid #e2e8f0', borderRadius:'14px', background:'#fff', cursor:'pointer', fontFamily:"'DM Sans', sans-serif", fontSize:'13px', fontWeight:'600', color:'#374151' }}>
+                <Facebook size={18} color="#1877F2" /> Facebook
+              </button>
+
+              {/* APPLE — coming soon */}
+              <button type="button" onClick={() => handleComingSoon('Apple')} className="social-btn" style={{ display:'flex', alignItems:'center', justifyContent:'center', gap:'8px', padding:'13px', border:'1.5px solid #e2e8f0', borderRadius:'14px', background:'#fff', cursor:'pointer', fontFamily:"'DM Sans', sans-serif", fontSize:'13px', fontWeight:'600', color:'#374151' }}>
+                <AppleIcon /> Apple
+              </button>
+            </div>
+
+            {/* Switch */}
+            <p style={{ marginTop:'28px', textAlign:'center', fontSize:'13px', color:'#94a3b8' }}>
+              New to the tribe?{' '}
+              <span onClick={() => navigate('/signup')} style={{ color:'#2563eb', fontWeight:'600', cursor:'pointer', textDecoration:'underline', textUnderlineOffset:'3px' }}>
+                Join Traveloop
+              </span>
+            </p>
+
+          </div>
         </div>
 
-        {/* Login Form */}
-        <div className="p-8 md:p-20 flex flex-col justify-center bg-white">
-          <div className="mb-10">
-            <div className="flex items-center gap-2 text-2xl font-black text-blue-700 mb-4">
-              <Plane className="rotate-45" size={28} /> <span className="tracking-tighter">TRAVELOOP</span>
-            </div>
-            <h3 className="text-4xl font-black text-gray-900 tracking-tighter uppercase leading-none">Confirm <br/> Your Booking</h3>
-            <p className="text-gray-400 font-bold text-[10px] uppercase tracking-[4px] mt-4">Welcome back, Traveler</p>
-          </div>
-
-          <form onSubmit={handleLogin} className="space-y-5">
-            <div className="space-y-2">
-              <label className="text-[10px] font-black text-gray-400 uppercase tracking-widest ml-1">Email Address</label>
-              <div className="relative group">
-                <Mail className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-300 group-focus-within:text-blue-600 transition" size={20} />
-                <input 
-                  required type="email" value={email} onChange={(e) => setEmail(e.target.value)}
-                  placeholder="Enter Registered Email" 
-                  className="w-full bg-slate-50 border border-slate-100 rounded-2xl py-4.5 pl-12 pr-4 outline-none focus:border-blue-600 focus:bg-white transition-all font-bold text-gray-800"
-                />
-              </div>
-            </div>
-
-            <div className="space-y-2">
-              <div className="flex justify-between items-center px-1">
-                <label className="text-[10px] font-black text-gray-400 uppercase tracking-widest">Security Key</label>
-                <button type="button" onClick={handleForgotPassword} className="text-[10px] font-black text-blue-600 uppercase tracking-widest hover:underline">Forgot?</button>
-              </div>
-              <div className="relative group">
-                <Lock className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-300 group-focus-within:text-blue-600 transition" size={20} />
-                <input 
-                  required type="password" value={password} onChange={(e) => setPassword(e.target.value)}
-                  placeholder="••••••••" 
-                  className="w-full bg-slate-50 border border-slate-100 rounded-2xl py-4.5 pl-12 pr-4 outline-none focus:border-blue-600 focus:bg-white transition-all font-bold text-gray-800"
-                />
-              </div>
-            </div>
-
-            <button 
-              type="submit" disabled={isLoading}
-              className="w-full bg-blue-700 text-white py-5 rounded-2xl font-black text-xs tracking-[3px] uppercase hover:bg-blue-800 transition-all shadow-2xl shadow-blue-200 flex items-center justify-center gap-3"
-            >
-              {isLoading ? "Checking Clearance..." : "Initiate Takeoff"} <ArrowRight size={20} />
-            </button>
-          </form>
-
-          {/* Social Logins Section */}
-          <div className="relative my-10">
-            <div className="absolute inset-0 flex items-center"><span className="w-full border-t border-slate-100"></span></div>
-            <div className="relative flex justify-center text-[10px] font-black text-gray-300 uppercase tracking-[4px]">
-              <span className="bg-white px-6">Gate Entry</span>
-            </div>
-          </div>
-
-          <div className="grid grid-cols-2 gap-4 mb-4">
-            <button onClick={handleGoogleLogin} className="flex items-center justify-center gap-3 py-4 border border-slate-100 rounded-2xl font-bold text-[10px] text-gray-500 hover:bg-slate-50 transition uppercase tracking-widest">
-              <Chrome size={16} className="text-red-500" /> Google
-            </button>
-            <button onClick={() => handleComingSoon('Github')} className="flex items-center justify-center gap-3 py-4 border border-slate-100 rounded-2xl font-bold text-[10px] text-gray-500 hover:bg-slate-50 transition uppercase tracking-widest">
-              <Github size={16} className="text-black" /> Github
-            </button>
-          </div>
-          
-          <div className="grid grid-cols-2 gap-4">
-            <button onClick={() => handleComingSoon('Facebook')} className="flex items-center justify-center gap-3 py-4 border border-slate-100 rounded-2xl font-bold text-[10px] text-gray-500 hover:bg-slate-50 transition uppercase tracking-widest">
-              <Facebook size={16} className="text-blue-600" /> Facebook
-            </button>
-            <button onClick={() => handleComingSoon('Apple')} className="flex items-center justify-center gap-3 py-4 border border-slate-100 rounded-2xl font-bold text-[10px] text-gray-500 hover:bg-slate-50 transition uppercase tracking-widest">
-              <Apple size={16} className="text-black" /> Apple
-            </button>
-          </div>
-
-          <p className="mt-10 text-center text-xs font-bold text-gray-400 uppercase tracking-widest">
-            New to the tribe? <span onClick={() => navigate('/signup')} className="text-blue-700 cursor-pointer hover:underline ml-1">Join Traveloop</span>
-          </p>
-        </div>
       </div>
     </div>
   );

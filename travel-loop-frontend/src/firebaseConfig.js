@@ -7,12 +7,19 @@ const firebaseConfig = {
   projectId: "travelloop-3665d",
   storageBucket: "travelloop-3665d.firebasestorage.app",
   messagingSenderId: "30915691226",
-  appId: "1:30915691226:web:0a7fdee3aaed1cf5bfdbe3",
-  measurementId: "G-HGFHVQ5V4Q"
+  appId: "1:30915691226:web:0a7fdee3aaed1cf5bfdbe3"
 };
 
 const app = initializeApp(firebaseConfig);
-// In teeno ko dhyan se export karo
-export const auth = getAuth(app);
+
+export const auth         = getAuth(app);
 export const googleProvider = new GoogleAuthProvider();
+
+// ── Extra scopes so Google returns display name + photo ──
+googleProvider.addScope('profile');
+googleProvider.addScope('email');
+
+// ── Always show account picker ──
+googleProvider.setCustomParameters({ prompt: 'select_account' });
+
 export { signInWithPopup };
