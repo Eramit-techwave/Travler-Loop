@@ -194,83 +194,61 @@ const Login = () => {
   };
 
   // ── LOGIC 2: GOOGLE LOGIN ──
-  // Firebase handles the popup, then the backend issues the app JWT.
-  const handleGoogleLogin = () => {
-    console.log('🔵 [Google Login] Button clicked');
-    if (gLoading) {
-      console.warn('⚠️ [Google Login] Already loading, skipping');
-      return;
-    }
-    setGLoading(true);
-
-    console.log('🔵 [Google Login] Starting signInWithPopup...');
-    signInWithPopup(auth, googleProvider)
-      .then(async (result) => {
-        console.log('✅ [Google Login] Firebase popup success');
-        const user = result.user;
-        console.log('✅ [Google Login] User data:', {
-          displayName: user.displayName,
-          email: user.email,
-          photoURL: user.photoURL,
-        });
-
-        console.log('🔵 [Google Login] Calling backend /api/auth/google...');
-        const response = await axios.post('http://localhost:5000/api/auth/google', {
-          username: user.displayName,
-          email: user.email,
-          profilePic: user.photoURL,
-        });
-
-        console.log('✅ [Google Login] Backend response:', response.data);
-
-        if (!response.data.success) {
-          throw new Error(response.data.message || 'Google login failed');
-        }
-
-        console.log('✅ [Google Login] Backend success confirmed');
+  const handleGoogleLogin = async () => {
+    try {
+      console.log('🔵 [Google] Button clicked');
+      
+      if (gLoading) {
+        console.warn('⚠️ [Google] Already loading');
+        return;
+      }
+      
+      setGLoading(true);
+      console.log('🔵 [Google] Attempting signInWithPopup...');
+      
+      const result = await signInWithPopup(auth, googleProvider);
+      
+      console.log('✅ [Google] Firebase auth successful');
+      console.log('✅ [Google] User:', result.user.email);
+      
+      const user = result.user;
+      
+      console.log('🔵 [Google] Calling backend...');
+      const response = await axios.post('http://localhost:5000/api/auth/google', {
+        username: user.displayName,
+        email: user.email,
+        profilePic: user.photoURL,
+      });
+      
+      console.log('✅ [Google] Backend response:', response.data);
+      
+      if (response.data.success) {
         localStorage.setItem('token', response.data.token);
         localStorage.setItem('user', JSON.stringify({
           ...response.data.user,
           profilePic: user.photoURL,
         }));
-        console.log('✅ [Google Login] Token stored in localStorage');
         alert(`Welcome ${user.displayName}! Ready for Takeoff 🚀`);
-        console.log('🔵 [Google Login] Navigating to /dashboard...');
         navigate('/dashboard');
-      })
-      .catch((error) => {
-        console.error('❌ [Google Login] Error caught:', {
-          code: error.code,
-          message: error.message,
-          fullError: error,
-        });
-
-        // User closed popup — not a real error
-        if (error.code === 'auth/popup-closed-by-user' ||
-            error.code === 'auth/cancelled-popup-request') {
-          console.log('ℹ️ [Google Login] User closed popup, no action needed');
-          return;
-        }
-
-        // Browser blocked popup or extension interference — use redirect
-        if (error.code === 'auth/popup-blocked' ||
-            error.code === 'auth/operation-not-supported-in-this-environment' ||
-            error.code === 'auth/unauthorized-domain' ||
-            error.message?.includes('message channel closed') ||
-            error.message?.includes('listener indicated an asynchronous response')) {
-          console.log('⚠️ [Google Login] Popup blocked/extension interfering, falling back to redirect...');
-          alert('Opening Google sign-in in a new tab...');
-          signInWithRedirect(auth, googleProvider);
-          return;
-        }
-
-        console.error('🔴 [Google Login] Unhandled error:', error);
-        alert(`Google Login Error: ${error.message}`);
-      })
-      .finally(() => {
-        console.log('🔵 [Google Login] Finally block - clearing loading state');
-        setGLoading(false);
-      });
+      }
+    } catch (error) {
+      console.error('❌ [Google] Error:', error);
+      console.error('   Code:', error.code);
+      console.error('   Message:', error.message);
+      
+      // Check if it's a user cancellation
+      if (error.code === 'auth/popup-closed-by-user' || 
+          error.code === 'auth/cancelled-popup-request') {
+        console.log('ℹ️ [Google] User cancelled');
+        return;
+      }
+      
+      // Show user-friendly error
+      alert(`Google Sign-In Error: ${error.message}`);
+    } finally {
+      setGLoading(false);
+      console.log('🔵 [Google] Loading state reset');
+    }
   };
 
   // ── LOGIC 3: FORGOT PASSWORD — UNTOUCHED ──
