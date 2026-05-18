@@ -1,5 +1,5 @@
 import { initializeApp } from "firebase/app";
-import { getAuth, GoogleAuthProvider, signInWithPopup } from "firebase/auth";
+import { getAuth, GoogleAuthProvider, signInWithRedirect } from "firebase/auth";
 
 const firebaseConfig = {
   apiKey: "AIzaSyBW2K1T17efLvjSyVUAuH6DrXReeP_fCt4",
@@ -27,4 +27,4 @@ googleProvider.addScope('email');
 // ── Always show account picker ──
 googleProvider.setCustomParameters({ prompt: 'select_account' });
 
-export { auth, googleProvider, signInWithPopup };
+export { auth, googleProvider, signInWithRedirect };

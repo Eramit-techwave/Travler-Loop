@@ -4,8 +4,8 @@ import { Plane, Mail, Lock, ArrowRight, ArrowLeft, Github, Facebook } from 'luci
 import { useNavigate } from 'react-router-dom';
 
 // ── FIREBASE IMPORTS ──
-import { auth, googleProvider, signInWithPopup } from '../firebaseConfig';
-import { getRedirectResult, sendPasswordResetEmail, signInWithRedirect } from 'firebase/auth';
+import { auth, googleProvider } from '../firebaseConfig';
+import { sendPasswordResetEmail, signInWithRedirect, getRedirectResult } from 'firebase/auth';
 
 /* ══════════════════════════════════════════
    GLOBAL STYLES
@@ -21,7 +21,6 @@ const injectGlobals = () => {
   const style = document.createElement('style');
   style.id = 'login-globals';
   style.textContent = `
-    /* ── Input text always visible ── */
     .login-input {
       color: #0f172a !important;
       -webkit-text-fill-color: #0f172a !important;
@@ -42,7 +41,6 @@ const injectGlobals = () => {
       -webkit-text-fill-color: #0f172a !important;
     }
 
-    /* ── Ken Burns per slide ── */
     @keyframes kb0 { from { transform: scale(1.00) translate(0,0); } to { transform: scale(1.10) translate(-15px,-8px); } }
     @keyframes kb1 { from { transform: scale(1.00) translate(0,0); } to { transform: scale(1.10) translate(12px,-10px); } }
     @keyframes kb2 { from { transform: scale(1.00) translate(0,0); } to { transform: scale(1.10) translate(-10px,8px); } }
@@ -55,7 +53,7 @@ const injectGlobals = () => {
     @keyframes form-up { from { opacity:0; transform:translateY(18px); } to { opacity:1; transform:translateY(0); } }
     .form-up { animation: form-up 0.5s cubic-bezier(0.22,1,0.36,1) both; }
 
-    @keyframes dot-pulse { 0%,100% { box-shadow:0 0 0 0 rgba(37,99,235,0.45); } 50% { box-shadow:0 0 0 6px rgba(37,99,235,0); } }
+    @keyframes dot-pulse { 0%,100__ { box-shadow:0 0 0 0 rgba(37,99,235,0.45); } 50% { box-shadow:0 0 0 6px rgba(37,99,235,0); } }
     .dot-pulse { animation: dot-pulse 1.8s ease-out infinite; }
 
     @keyframes shimmer { 0% { background-position:-200% center; } 100% { background-position:200% center; } }
@@ -71,9 +69,6 @@ const injectGlobals = () => {
   document.head.appendChild(style);
 };
 
-/* ══════════════════════════════════════════
-   SLIDES
-══════════════════════════════════════════ */
 const SLIDES = [
   { url:'https://images.unsplash.com/photo-1527631746610-bca00a040d60?q=80&w=1200&auto=format', tag:'FIRST CLASS', line1:'The World',    line2:'Is Waiting.',   sub:'Premium travel for the discerning explorer.', kb:'kb0' },
   { url:'https://images.unsplash.com/photo-1506929113675-b9299d39bb14?q=80&w=1200&auto=format', tag:'ADVENTURE',   line1:'Find Your',     line2:'Next Story.',    sub:'Off-the-beaten-path destinations.',           kb:'kb1' },
@@ -81,9 +76,6 @@ const SLIDES = [
   { url:'https://images.unsplash.com/photo-1503220317375-aaad61436b1b?q=80&w=1200&auto=format', tag:'DISCOVER',    line1:'Explore',       line2:'Hidden Gems.',   sub:'Curated routes to places maps forget.',       kb:'kb3' },
 ];
 
-/* ══════════════════════════════════════════
-   ICONS
-══════════════════════════════════════════ */
 const GoogleIcon = () => (
   <svg width="18" height="18" viewBox="0 0 24 24" fill="none">
     <path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" fill="#4285F4"/>
@@ -99,9 +91,6 @@ const AppleIcon = () => (
   </svg>
 );
 
-/* ══════════════════════════════════════════
-   MAIN COMPONENT
-══════════════════════════════════════════ */
 const Login = () => {
   const navigate = useNavigate();
 
@@ -116,53 +105,50 @@ const Login = () => {
 
   useEffect(() => { injectGlobals(); }, []);
 
+  // Handle redirect result after Google sign-in
   useEffect(() => {
-    const finishRedirectLogin = async () => {
-      console.log('🔵 [Google Redirect] Checking for redirect result on page load...');
+    const handleRedirectResult = async () => {
       try {
+        console.log('🔵 [Redirect] Checking for redirect result...');
         const result = await getRedirectResult(auth);
+        
         if (!result?.user) {
-          console.log('ℹ️ [Google Redirect] No redirect result found, normal page load');
+          console.log('ℹ️ [Redirect] No result (normal page load)');
           return;
         }
 
-        console.log('✅ [Google Redirect] Found redirect result!');
+        console.log('✅ [Redirect] Got Firebase result for:', result.user.email);
         const user = result.user;
-        console.log('✅ [Google Redirect] User data:', {
-          displayName: user.displayName,
-          email: user.email,
-          photoURL: user.photoURL,
-        });
 
-        console.log('🔵 [Google Redirect] Calling backend /api/auth/google...');
+        console.log('🔵 [Redirect] Calling backend /api/auth/google...');
         const response = await axios.post('http://localhost:5000/api/auth/google', {
           username: user.displayName,
           email: user.email,
           profilePic: user.photoURL,
         });
 
-        console.log('✅ [Google Redirect] Backend response:', response.data);
+        console.log('✅ [Redirect] Backend response:', response.data);
 
-        if (!response.data.success) {
-          throw new Error(response.data.message || 'Google login failed');
+        if (response.data.success) {
+          localStorage.setItem('token', response.data.token);
+          localStorage.setItem('user', JSON.stringify({
+            ...response.data.user,
+            profilePic: user.photoURL,
+          }));
+          console.log('✅ [Redirect] Redirecting to dashboard...');
+          navigate('/dashboard');
+        } else {
+          throw new Error(response.data.message || 'Backend login failed');
         }
-
-        localStorage.setItem('token', response.data.token);
-        localStorage.setItem('user', JSON.stringify({
-          ...response.data.user,
-          profilePic: user.photoURL,
-        }));
-        console.log('✅ [Google Redirect] Navigating to /dashboard...');
-        navigate('/dashboard');
       } catch (error) {
-        console.error('❌ [Google Redirect] Error:', error);
+        console.error('❌ [Redirect] Error:', error);
       }
     };
 
-    finishRedirectLogin();
+    handleRedirectResult();
   }, [navigate]);
 
-  // Auto-advance
+  // Auto-advance slideshow
   useEffect(() => {
     const t = setInterval(() => goTo((curSlide + 1) % SLIDES.length), 4500);
     return () => clearInterval(t);
@@ -175,7 +161,7 @@ const Login = () => {
     setTimeout(() => { setCurSlide(idx); setPrevSlide(null); setInTrans(false); }, 800);
   };
 
-  // ── LOGIC 1: EMAIL LOGIN — UNTOUCHED ──
+  // ── LOGIC 1: EMAIL LOGIN ──
   const handleLogin = async (e) => {
     e.preventDefault();
     setIsLoading(true);
@@ -193,65 +179,19 @@ const Login = () => {
     }
   };
 
-  // ── LOGIC 2: GOOGLE LOGIN ──
+  // ── LOGIC 2: GOOGLE LOGIN (REDIRECT) ──
+  // Using redirect instead of popup - works even with popup blockers
   const handleGoogleLogin = async () => {
     try {
-      console.log('🔵 [Google] Button clicked');
-      
-      if (gLoading) {
-        console.warn('⚠️ [Google] Already loading');
-        return;
-      }
-      
-      setGLoading(true);
-      console.log('🔵 [Google] Attempting signInWithPopup...');
-      
-      const result = await signInWithPopup(auth, googleProvider);
-      
-      console.log('✅ [Google] Firebase auth successful');
-      console.log('✅ [Google] User:', result.user.email);
-      
-      const user = result.user;
-      
-      console.log('🔵 [Google] Calling backend...');
-      const response = await axios.post('http://localhost:5000/api/auth/google', {
-        username: user.displayName,
-        email: user.email,
-        profilePic: user.photoURL,
-      });
-      
-      console.log('✅ [Google] Backend response:', response.data);
-      
-      if (response.data.success) {
-        localStorage.setItem('token', response.data.token);
-        localStorage.setItem('user', JSON.stringify({
-          ...response.data.user,
-          profilePic: user.photoURL,
-        }));
-        alert(`Welcome ${user.displayName}! Ready for Takeoff 🚀`);
-        navigate('/dashboard');
-      }
+      console.log('🔵 [Google] Starting sign-in redirect...');
+      await signInWithRedirect(auth, googleProvider);
     } catch (error) {
       console.error('❌ [Google] Error:', error);
-      console.error('   Code:', error.code);
-      console.error('   Message:', error.message);
-      
-      // Check if it's a user cancellation
-      if (error.code === 'auth/popup-closed-by-user' || 
-          error.code === 'auth/cancelled-popup-request') {
-        console.log('ℹ️ [Google] User cancelled');
-        return;
-      }
-      
-      // Show user-friendly error
       alert(`Google Sign-In Error: ${error.message}`);
-    } finally {
-      setGLoading(false);
-      console.log('🔵 [Google] Loading state reset');
     }
   };
 
-  // ── LOGIC 3: FORGOT PASSWORD — UNTOUCHED ──
+  // ── LOGIC 3: FORGOT PASSWORD ──
   const handleForgotPassword = async (e) => {
     e.preventDefault();
     const resetEmail = prompt('Enter your registered email to receive a recovery link:');
@@ -265,8 +205,10 @@ const Login = () => {
     }
   };
 
-  const handleComingSoon = (platform) =>
-    alert(`Standby! ${platform} integration is coming in the next update.`);
+  // ── LOGIC 4: COMING SOON ALERT FIX ──
+  const handleComingSoon = (platform) => {
+    alert(`Standby! ${platform} integration is coming in the next update. 🛠️`);
+  };
 
   const cur  = SLIDES[curSlide];
   const prev = prevSlide !== null ? SLIDES[prevSlide] : null;
@@ -283,7 +225,6 @@ const Login = () => {
     transition: 'border-color .2s, background .2s, box-shadow .2s',
   });
 
-  /* ══ RENDER ══ */
   return (
     <div style={{ minHeight:'100vh', background:'#f0f4ff', display:'flex', alignItems:'center', justifyContent:'center', padding:'20px', fontFamily:"'DM Sans', sans-serif", position:'relative', overflow:'hidden' }}>
 
@@ -291,7 +232,7 @@ const Login = () => {
       <div style={{ position:'fixed', top:'-10%', left:'-10%', width:'40%', height:'40%', background:'rgba(191,219,254,0.4)', borderRadius:'50%', filter:'blur(80px)', pointerEvents:'none' }} />
       <div style={{ position:'fixed', bottom:'-10%', right:'-10%', width:'40%', height:'40%', background:'rgba(199,210,254,0.4)', borderRadius:'50%', filter:'blur(80px)', pointerEvents:'none' }} />
 
-      {/* Back */}
+      {/* Back Button */}
       <button
         onClick={() => navigate('/')}
         style={{ position:'fixed', top:'24px', left:'24px', zIndex:100, background:'rgba(255,255,255,0.9)', backdropFilter:'blur(8px)', border:'1px solid #e2e8f0', borderRadius:'100px', padding:'8px 16px 8px 12px', cursor:'pointer', display:'flex', alignItems:'center', gap:'6px', color:'#64748b', fontSize:'10px', fontWeight:'600', letterSpacing:'.14em', textTransform:'uppercase', fontFamily:"'DM Sans', sans-serif", boxShadow:'0 2px 8px rgba(0,0,0,0.08)' }}
@@ -299,63 +240,41 @@ const Login = () => {
         <ArrowLeft size={14} /> Back to Explore
       </button>
 
-      {/* Card */}
+      {/* Main Container Card */}
       <div style={{ position:'relative', zIndex:1, width:'100%', maxWidth:'1150px', minHeight:'700px', display:'grid', gridTemplateColumns:'1fr 1fr', borderRadius:'32px', overflow:'hidden', boxShadow:'0 40px 80px rgba(0,0,0,0.18)', background:'#fff' }}>
 
-        {/* ══ LEFT — SLIDESHOW ══ */}
+        {/* SLIDESHOW (LEFT) */}
         <div style={{ position:'relative', overflow:'hidden', background:'#0f172a' }}>
-
-          {/* Outgoing */}
           {prev && (
             <div style={{ position:'absolute', inset:0, zIndex:1, opacity: inTrans ? 0 : 1, transition:'opacity .8s ease' }}>
               <img src={prev.url} alt="" style={{ width:'100%', height:'100%', objectFit:'cover' }} />
             </div>
           )}
-
-          {/* Current + Ken Burns */}
           <div style={{ position:'absolute', inset:0, zIndex:2, overflow:'hidden' }}>
-            <img
-              key={curSlide}
-              src={cur.url}
-              alt="Destination"
-              className={cur.kb}
-              style={{ width:'100%', height:'100%', objectFit:'cover', transformOrigin:'center center' }}
-            />
+            <img key={curSlide} src={cur.url} alt="Destination" className={cur.kb} style={{ width:'100%', height:'100%', objectFit:'cover', transformOrigin:'center center' }} />
           </div>
-
-          {/* Gradient */}
           <div style={{ position:'absolute', inset:0, zIndex:3, background:'linear-gradient(to top, rgba(10,20,60,0.92) 0%, rgba(10,20,60,0.25) 55%, rgba(10,20,60,0.10) 100%)' }} />
-
-          {/* Text */}
+          
           <div style={{ position:'absolute', inset:0, zIndex:4, padding:'52px 48px', display:'flex', flexDirection:'column', justifyContent:'flex-end' }}>
             <div style={{ display:'inline-flex', alignItems:'center', padding:'4px 12px', borderRadius:'100px', border:'1px solid rgba(255,255,255,0.22)', background:'rgba(255,255,255,0.08)', backdropFilter:'blur(4px)', marginBottom:'16px', width:'fit-content' }}>
               <span style={{ fontSize:'9px', fontWeight:'700', letterSpacing:'.2em', color:'#93c5fd' }}>{cur.tag}</span>
             </div>
             <h2 style={{ fontFamily:"'Cormorant Garamond', serif", fontSize:'58px', fontWeight:'600', fontStyle:'italic', color:'#f8fafc', lineHeight:'.90', letterSpacing:'-.02em', marginBottom:'14px' }}>
-              {cur.line1}<br />
-              <span style={{ color:'#60a5fa' }}>{cur.line2}</span>
+              {cur.line1}<br /><span style={{ color:'#60a5fa' }}>{cur.line2}</span>
             </h2>
-            <p style={{ color:'rgba(248,250,252,0.50)', fontSize:'13px', fontWeight:'300', lineHeight:'1.6', maxWidth:'280px', marginBottom:'32px' }}>
-              {cur.sub}
-            </p>
-            {/* Dots */}
+            <p style={{ color:'rgba(248,250,252,0.50)', fontSize:'13px', fontWeight:'300', lineHeight:'1.6', maxWidth:'280px', marginBottom:'32px' }}>{cur.sub}</p>
             <div style={{ display:'flex', gap:'8px', alignItems:'center' }}>
               {SLIDES.map((_, i) => (
-                <button
-                  key={i}
-                  onClick={() => goTo(i)}
-                  className={i === curSlide ? 'dot-pulse' : ''}
-                  style={{ width: i === curSlide ? '28px' : '7px', height:'7px', borderRadius:'100px', background: i === curSlide ? '#3b82f6' : 'rgba(255,255,255,0.28)', border:'none', cursor:'pointer', padding:0, transition:'all .4s cubic-bezier(0.34,1.56,0.64,1)' }}
-                />
+                <button key={i} onClick={() => goTo(i)} className={i === curSlide ? 'dot-pulse' : ''} style={{ width: i === curSlide ? '28px' : '7px', height:'7px', borderRadius:'100px', background: i === curSlide ? '#3b82f6' : 'rgba(255,255,255,0.28)', border:'none', cursor:'pointer', padding:0, transition:'all .4s cubic-bezier(0.34,1.56,0.64,1)' }} />
               ))}
             </div>
           </div>
         </div>
 
-        {/* ══ RIGHT — FORM ══ */}
-        <div style={{ padding:'52px 56px', display:'flex', flexDirection:'column', justifyContent:'center', background:'#ffffff', overflowY:'auto' }}>
+        {/* LOGIN CONTENT (RIGHT) */}
+        <div style={{ padding:'52px 56px', display:'flex', flexDirection:'column', justifyOffset:'center', background:'#ffffff', overflowY:'auto' }}>
           <div className="form-up">
-
+            
             {/* Logo */}
             <div style={{ display:'flex', alignItems:'center', gap:'10px', marginBottom:'40px' }}>
               <div style={{ width:'36px', height:'36px', borderRadius:'10px', background:'linear-gradient(135deg,#1e3a8a,#2563eb)', display:'flex', alignItems:'center', justifyContent:'center' }}>
@@ -364,35 +283,22 @@ const Login = () => {
               <span style={{ fontFamily:"'Cormorant Garamond', serif", fontSize:'20px', fontWeight:'700', color:'#1e3a8a', letterSpacing:'.04em' }}>Traveloop</span>
             </div>
 
-            {/* Heading */}
+            {/* Header Title */}
             <div style={{ marginBottom:'28px' }}>
               <p style={{ fontSize:'10px', fontWeight:'600', letterSpacing:'.22em', textTransform:'uppercase', color:'#2563eb', marginBottom:'8px' }}>Welcome back, Traveler</p>
-              <h3 style={{ fontFamily:"'Cormorant Garamond', serif", fontSize:'40px', fontWeight:'700', color:'#0f172a', lineHeight:'1', margin:0 }}>
-                Confirm Your<br />Booking
-              </h3>
+              <h3 style={{ fontFamily:"'Cormorant Garamond', serif", fontSize:'40px', fontWeight:'700', color:'#0f172a', lineHeight:'1', margin:0 }}>Confirm Your<br />Booking</h3>
             </div>
 
-            {/* Form */}
+            {/* Regular Form */}
             <form onSubmit={handleLogin} style={{ display:'flex', flexDirection:'column', gap:'14px' }}>
-
-              {/* Email */}
               <div>
                 <label style={{ display:'block', fontSize:'10px', fontWeight:'600', letterSpacing:'.18em', textTransform:'uppercase', color:'#94a3b8', marginBottom:'6px' }}>Email Address</label>
                 <div style={{ position:'relative' }}>
                   <Mail size={16} style={{ position:'absolute', left:'14px', top:'50%', transform:'translateY(-50%)', color: focused==='email' ? '#2563eb' : '#cbd5e1', transition:'color .2s', pointerEvents:'none' }} />
-                  <input
-                    required type="email" value={email}
-                    placeholder="Enter registered email"
-                    onChange={e => setEmail(e.target.value)}
-                    onFocus={() => setFocused('email')}
-                    onBlur={() => setFocused(null)}
-                    className="login-input"
-                    style={inputSt('email')}
-                  />
+                  <input required type="email" value={email} placeholder="Enter registered email" onChange={e => setEmail(e.target.value)} onFocus={() => setFocused('email')} onBlur={() => setFocused(null)} className="login-input" style={inputSt('email')} />
                 </div>
               </div>
 
-              {/* Password */}
               <div>
                 <div style={{ display:'flex', justifyContent:'space-between', marginBottom:'6px' }}>
                   <label style={{ fontSize:'10px', fontWeight:'600', letterSpacing:'.18em', textTransform:'uppercase', color:'#94a3b8' }}>Security Key</label>
@@ -400,73 +306,42 @@ const Login = () => {
                 </div>
                 <div style={{ position:'relative' }}>
                   <Lock size={16} style={{ position:'absolute', left:'14px', top:'50%', transform:'translateY(-50%)', color: focused==='pass' ? '#2563eb' : '#cbd5e1', transition:'color .2s', pointerEvents:'none' }} />
-                  <input
-                    required type="password" value={password}
-                    placeholder="••••••••"
-                    onChange={e => setPassword(e.target.value)}
-                    onFocus={() => setFocused('pass')}
-                    onBlur={() => setFocused(null)}
-                    className="login-input"
-                    style={inputSt('pass')}
-                  />
+                  <input required type="password" value={password} placeholder="••••••••" onChange={e => setPassword(e.target.value)} onFocus={() => setFocused('pass')} onBlur={() => setFocused(null)} className="login-input" style={inputSt('pass')} />
                 </div>
               </div>
 
-              {/* Submit */}
-              <button
-                type="submit" disabled={isLoading}
-                className="btn-shimmer"
-                style={{ width:'100%', padding:'15px', border:'none', borderRadius:'14px', color:'#fff', fontFamily:"'DM Sans', sans-serif", fontSize:'12px', fontWeight:'600', letterSpacing:'.14em', textTransform:'uppercase', cursor: isLoading ? 'not-allowed' : 'pointer', opacity: isLoading ? .65 : 1, display:'flex', alignItems:'center', justifyContent:'center', gap:'8px', marginTop:'4px' }}
-                onMouseEnter={e => { if(!isLoading) e.currentTarget.style.transform='translateY(-1px)'; }}
-                onMouseLeave={e => { e.currentTarget.style.transform='none'; }}
-              >
+              <button type="submit" disabled={isLoading} className="btn-shimmer" style={{ width:'100%', padding:'15px', border:'none', borderRadius:'14px', color:'#fff', fontFamily:"'DM Sans', sans-serif", fontSize:'12px', fontWeight:'600', letterSpacing:'.14em', textTransform:'uppercase', cursor: isLoading ? 'not-allowed' : 'pointer', opacity: isLoading ? .65 : 1, display:'flex', alignItems:'center', justifyContent:'center', gap:'8px', marginTop:'4px' }}>
                 {isLoading ? 'Checking Clearance…' : 'Initiate Takeoff'} <ArrowRight size={16} />
               </button>
             </form>
 
-            {/* Divider */}
             <div style={{ display:'flex', alignItems:'center', gap:'12px', margin:'22px 0' }}>
               <hr style={{ flex:1, border:'none', borderTop:'1px solid #f1f5f9' }} />
               <span style={{ fontSize:'10px', fontWeight:'600', letterSpacing:'.18em', textTransform:'uppercase', color:'#cbd5e1' }}>Gate Entry</span>
               <hr style={{ flex:1, border:'none', borderTop:'1px solid #f1f5f9' }} />
             </div>
 
-            {/* Social — 2x2 grid */}
+            {/* Social Authentication Grid */}
             <div style={{ display:'grid', gridTemplateColumns:'1fr 1fr', gap:'10px' }}>
-
-              {/* ✅ GOOGLE — WORKING */}
-              <button
-                type="button"
-                onClick={handleGoogleLogin}
-                disabled={gLoading}
-                className="social-btn"
-                style={{ display:'flex', alignItems:'center', justifyContent:'center', gap:'8px', padding:'13px', border:'1.5px solid #e2e8f0', borderRadius:'14px', background:'#fff', cursor: gLoading ? 'not-allowed' : 'pointer', fontFamily:"'DM Sans', sans-serif", fontSize:'13px', fontWeight:'600', color:'#374151', opacity: gLoading ? .65 : 1 }}
-              >
+              <button type="button" onClick={handleGoogleLogin} disabled={gLoading} className="social-btn" style={{ display:'flex', alignItems:'center', justifyContent:'center', gap:'8px', padding:'13px', border:'1.5px solid #e2e8f0', borderRadius:'14px', background:'#fff', cursor: gLoading ? 'not-allowed' : 'pointer', fontFamily:"'DM Sans', sans-serif", fontSize:'13px', fontWeight:'600', color:'#374151', opacity: gLoading ? .65 : 1 }}>
                 <GoogleIcon /> {gLoading ? 'Opening…' : 'Google'}
               </button>
 
-              {/* GITHUB — coming soon */}
               <button type="button" onClick={() => handleComingSoon('Github')} className="social-btn" style={{ display:'flex', alignItems:'center', justifyContent:'center', gap:'8px', padding:'13px', border:'1.5px solid #e2e8f0', borderRadius:'14px', background:'#fff', cursor:'pointer', fontFamily:"'DM Sans', sans-serif", fontSize:'13px', fontWeight:'600', color:'#374151' }}>
                 <Github size={18} /> Github
               </button>
 
-              {/* FACEBOOK — coming soon */}
               <button type="button" onClick={() => handleComingSoon('Facebook')} className="social-btn" style={{ display:'flex', alignItems:'center', justifyContent:'center', gap:'8px', padding:'13px', border:'1.5px solid #e2e8f0', borderRadius:'14px', background:'#fff', cursor:'pointer', fontFamily:"'DM Sans', sans-serif", fontSize:'13px', fontWeight:'600', color:'#374151' }}>
                 <Facebook size={18} color="#1877F2" /> Facebook
               </button>
 
-              {/* APPLE — coming soon */}
               <button type="button" onClick={() => handleComingSoon('Apple')} className="social-btn" style={{ display:'flex', alignItems:'center', justifyContent:'center', gap:'8px', padding:'13px', border:'1.5px solid #e2e8f0', borderRadius:'14px', background:'#fff', cursor:'pointer', fontFamily:"'DM Sans', sans-serif", fontSize:'13px', fontWeight:'600', color:'#374151' }}>
                 <AppleIcon /> Apple
               </button>
             </div>
 
-            {/* Switch */}
             <p style={{ marginTop:'28px', textAlign:'center', fontSize:'13px', color:'#94a3b8' }}>
-              New to the tribe?{' '}
-              <span onClick={() => navigate('/signup')} style={{ color:'#2563eb', fontWeight:'600', cursor:'pointer', textDecoration:'underline', textUnderlineOffset:'3px' }}>
-                Join Traveloop
-              </span>
+              New to the tribe? <span onClick={() => navigate('/signup')} style={{ color:'#2563eb', fontWeight:'600', cursor:'pointer', textDecoration:'underline', textUnderlineOffset:'3px' }}>Join Traveloop</span>
             </p>
 
           </div>
