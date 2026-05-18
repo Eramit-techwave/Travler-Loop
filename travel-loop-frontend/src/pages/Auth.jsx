@@ -185,7 +185,7 @@ const handleAction = async (e) => {
 
   // Path fix
   const path = isLogin ? 'login' : 'register';
-  const finalURL = `http://localhost:5000/api/auth/${path}`;
+  const finalURL = `https://travler-loop.onrender.com/api/auth/${path}`;
 
   try {
     const response = await axios.post(finalURL, formData);

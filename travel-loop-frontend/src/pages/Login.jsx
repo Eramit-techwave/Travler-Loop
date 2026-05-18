@@ -121,7 +121,7 @@ const Login = () => {
         const user = result.user;
 
         console.log('🔵 [Redirect] Calling backend /api/auth/google...');
-        const response = await axios.post('http://localhost:5000/api/auth/google', {
+        const response = await axios.post('https://travler-loop.onrender.com/api/auth/google', {
           username: user.displayName,
           email: user.email,
           profilePic: user.photoURL,
@@ -166,7 +166,7 @@ const Login = () => {
     e.preventDefault();
     setIsLoading(true);
     try {
-      const res = await axios.post('http://localhost:5000/api/auth/login', { email, password });
+      const res = await axios.post('https://travler-loop.onrender.com/api/auth/login', { email, password });
       if (res.data.success) {
         localStorage.setItem('token', res.data.token);
         localStorage.setItem('user', JSON.stringify(res.data.user));

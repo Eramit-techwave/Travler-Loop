@@ -38,7 +38,7 @@ const Dashboard = () => {
       const token = localStorage.getItem('token');
       if (!token) return;
 
-      const response = await axios.get('http://localhost:5000/api/trips/my-trips', {
+      const response = await axios.get('https://travler-loop.onrender.com/api/trips/my-trips', {
         headers: { Authorization: `Bearer ${token}` }
       });
       
@@ -89,7 +89,7 @@ const Dashboard = () => {
         totalBudget: Number(bookingData.budget) || 0 // Dynamic Budget from input
       };
 
-      const response = await axios.post('http://localhost:5000/api/trips/add', tripPayload, {
+      const response = await axios.post('https://travler-loop.onrender.com/api/trips/add', tripPayload, {
         headers: { Authorization: `Bearer ${token}` }
       });
 

@@ -3,10 +3,10 @@ const router = express.Router();
 const tripController = require('../controllers/tripController');
 const { protect } = require('../middleware/authMiddleware'); // Braces check karein
 
-// CREATE: POST http://localhost:5000/api/trips/add
+// CREATE: POST https://travler-loop.onrender.com/api/trips/add
 router.post('/add', protect, tripController.createTrip);
 
-// FETCH: GET http://localhost:5000/api/trips/my-trips
+// FETCH: GET https://travler-loop.onrender.com/api/trips/my-trips
 router.get('/my-trips', protect, tripController.getMyTrips);
 
 module.exports = router;

@@ -17,7 +17,7 @@ app.use(cors());
 app.use(express.json());
 
 // Routes use karna
-// Ab tumhara login URL hoga: http://localhost:5000/api/auth/login
+// Ab tumhara login URL hoga: https://travler-loop.onrender.com/api/auth/login
 app.use('/api/auth', authRoutes);
 app.use('/api/trips', tripRoutes); 
 
