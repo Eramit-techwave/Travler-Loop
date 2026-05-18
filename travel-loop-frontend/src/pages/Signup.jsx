@@ -42,17 +42,29 @@ const Signup = () => {
 
   const handleSignup = async (e) => {
     e.preventDefault();
+    
+    if (!formData.username || !formData.email || !formData.password) {
+      alert('Please fill in all fields');
+      return;
+    }
+
+    if (formData.password.length < 6) {
+      alert('Password must be at least 6 characters');
+      return;
+    }
+
     setIsLoading(true);
     try {
-      // Backend Signup API Call
-      // Make sure your backend route is /api/auth/register or /api/auth/signup
-      const response = await axios.post('https://travler-loop.onrender.com/api/auth/register', formData);
+      const response = await axios.post('http://localhost:5000/api/auth/register', formData);
       if (response.data.success) {
-        alert("Account Created Successfully! 🚀");
+        alert('Account created successfully');
         navigate('/login');
+      } else {
+        alert(response.data.message || 'Signup failed');
       }
     } catch (error) {
-      alert(error.response?.data?.message || "Signup failed! Try a different email.");
+      console.error('[Auth] Signup error:', error);
+      alert(error.response?.data?.message || 'Signup failed. Please try again.');
     } finally {
       setIsLoading(false);
     }

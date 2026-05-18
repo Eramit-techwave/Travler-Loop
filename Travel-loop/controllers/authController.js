@@ -12,7 +12,15 @@ const createToken = (userId) => jwt.sign({ id: userId }, JWT_SECRET, { expiresIn
  */
 exports.signup = async (req, res) => {
     try {
+        console.log('[Auth] Signup request body:', req.body);
         const { username, email, password } = req.body;
+
+        if (!username || !email || !password) {
+            return res.status(400).json({
+                success: false,
+                message: 'Username, email, and password are required'
+            });
+        }
 
         // Check if user already exists
         const userExists = await User.findOne({ email });
@@ -28,18 +36,24 @@ exports.signup = async (req, res) => {
         const hashedPassword = await bcrypt.hash(password, salt);
 
         // Create user
-        await User.create({
+        const newUser = await User.create({
             username,
             email,
             password: hashedPassword
         });
+
+        console.log('[Auth] User created:', newUser._id);
 
         res.status(201).json({
             success: true,
             message: 'User registered successfully'
         });
     } catch (err) {
-        console.error('[Auth] Signup error:', err);
+        console.error('[Auth] Signup error - Full details:', {
+            message: err.message,
+            stack: err.stack,
+            name: err.name
+        });
         res.status(500).json({
             success: false,
             message: 'Registration failed. Please try again.'
@@ -62,7 +76,7 @@ exports.login = async (req, res) => {
             });
         }
 
-        const user = await User.findOne({ email });
+        const user = await User.findOne({ email }).select('+password');
 
         if (!user || !(await bcrypt.compare(password, user.password))) {
             return res.status(401).json({
