@@ -245,16 +245,21 @@ const Login = () => {
           fullError: error,
         });
 
+        // User closed popup — not a real error
         if (error.code === 'auth/popup-closed-by-user' ||
             error.code === 'auth/cancelled-popup-request') {
           console.log('ℹ️ [Google Login] User closed popup, no action needed');
           return;
         }
 
+        // Browser blocked popup or extension interference — use redirect
         if (error.code === 'auth/popup-blocked' ||
             error.code === 'auth/operation-not-supported-in-this-environment' ||
-            error.code === 'auth/unauthorized-domain') {
-          console.log('⚠️ [Google Login] Popup blocked/unsupported, falling back to redirect...');
+            error.code === 'auth/unauthorized-domain' ||
+            error.message?.includes('message channel closed') ||
+            error.message?.includes('listener indicated an asynchronous response')) {
+          console.log('⚠️ [Google Login] Popup blocked/extension interfering, falling back to redirect...');
+          alert('Opening Google sign-in in a new tab...');
           signInWithRedirect(auth, googleProvider);
           return;
         }
