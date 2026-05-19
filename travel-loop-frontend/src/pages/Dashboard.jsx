@@ -25,8 +25,10 @@ const Dashboard = () => {
   const [userName, setUserName] = useState('Explorer');
   const [myTrips, setMyTrips] = useState([]);
   const [tripStats, setTripStats] = useState({ total: 0, completed: 0, ongoing: 0, planning: 0 });
+  const [hoveredTripId, setHoveredTripId] = useState(null);
   
   const [bookingData, setBookingData] = useState({ 
+    origin: '',
     destination: '', 
     startDate: '', 
     travelers: '1 Person',
@@ -257,7 +259,7 @@ const Dashboard = () => {
           </div>
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(350px, 1fr))', gap: '25px' }}>
             {myTrips.length > 0 ? myTrips.map((trip, idx) => (
-              <div key={idx} onClick={() => navigate(`/trip/${trip._id}`)} style={{ background: T.white, borderRadius: '28px', padding: '25px', border: '1px solid #f1f5f9', boxShadow: '0 10px 30px rgba(0,0,0,0.02)', transition: 'all 0.3s', cursor: 'pointer' }} onMouseEnter={e => e.currentTarget.style.boxShadow = '0 20px 40px rgba(0,0,0,0.08)'} onMouseLeave={e => e.currentTarget.style.boxShadow = '0 10px 30px rgba(0,0,0,0.02)'}}>
+              <div key={idx} onClick={() => navigate(`/trip/${trip._id}`)} onMouseEnter={() => setHoveredTripId(trip._id)} onMouseLeave={() => setHoveredTripId(null)} style={{ background: T.white, borderRadius: '28px', padding: '25px', border: '1px solid #f1f5f9', boxShadow: hoveredTripId === trip._id ? '0 20px 40px rgba(0,0,0,0.08)' : '0 10px 30px rgba(0,0,0,0.02)', transition: 'all 0.3s', cursor: 'pointer' }}>
                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'start', marginBottom: '15px' }}>
                   <div>
                     <h4 style={{ fontWeight: 800, fontSize: '17px', margin: 0, marginBottom: '5px' }}>{trip.tripName}</h4>

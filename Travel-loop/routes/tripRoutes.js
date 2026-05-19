@@ -35,4 +35,7 @@ router.post('/:tripId/hotels', protect, tripController.addHotelBooking);
 // REMOVE HOTEL: DELETE /api/trips/:tripId/hotels/:hotelId
 router.delete('/:tripId/hotels/:hotelId', protect, tripController.removeHotelBooking);
 
+// SEARCH HOTELS: GET /api/trips/hotels/search/:destination
+router.get('/hotels/search/:destination', protect, tripController.searchHotels);
+
 module.exports = router;

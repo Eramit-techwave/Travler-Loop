@@ -15,6 +15,8 @@ const TripDetail = () => {
   const [weather, setWeather] = useState(null);
   const [distance, setDistance] = useState(null);
   const [showHotelForm, setShowHotelForm] = useState(false);
+  const [availableHotels, setAvailableHotels] = useState([]);
+  const [showAvailableHotels, setShowAvailableHotels] = useState(false);
   
   const [editData, setEditData] = useState({
     tripName: '',
@@ -168,6 +170,55 @@ const TripDetail = () => {
     }
   };
 
+  const searchAvailableHotels = async () => {
+    if (!trip || !trip.destination) {
+      alert('Destination not found');
+      return;
+    }
+
+    try {
+      const token = localStorage.getItem('token');
+      const response = await axios.get(`${apiUrl}/api/trips/hotels/search/${trip.destination}`, {
+        headers: { Authorization: `Bearer ${token}` }
+      });
+
+      if (response.data.success || response.data.data) {
+        setAvailableHotels(response.data.data);
+        setShowAvailableHotels(true);
+      }
+    } catch (error) {
+      console.error('Error searching hotels:', error);
+      alert('Failed to search hotels');
+    }
+  };
+
+  const bookHotelFromSearch = async (hotel) => {
+    try {
+      const token = localStorage.getItem('token');
+      const bookingData = {
+        name: hotel.name,
+        location: hotel.location,
+        checkIn: trip.startDate,
+        checkOut: trip.endDate,
+        price: hotel.price,
+        rating: hotel.rating
+      };
+
+      const response = await axios.post(`${apiUrl}/api/trips/${tripId}/hotels`, bookingData, {
+        headers: { Authorization: `Bearer ${token}` }
+      });
+
+      if (response.data.success) {
+        setTrip(response.data.data);
+        alert(`${hotel.name} booked successfully!`);
+        setShowAvailableHotels(false);
+      }
+    } catch (error) {
+      console.error('Error booking hotel:', error);
+      alert('Failed to book hotel');
+    }
+  };
+
   if (loading) {
     return <div style={{ textAlign: 'center', padding: '50px' }}>Loading trip details...</div>;
   }
@@ -248,62 +299,75 @@ const TripDetail = () => {
         )}
 
         {/* Info Cards */}
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '15px', marginBottom: '30px' }}>
+        <div style={{ marginBottom: '20px' }}>
+          <h2 style={{ color: '#0f172a', marginBottom: '15px', fontSize: '18px', fontWeight: '700' }}>📊 Trip Overview</h2>
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))', gap: '15px', marginBottom: '30px' }}>
           
           {/* Weather Card */}
-          <div style={{ background: '#fff', padding: '20px', borderRadius: '12px', boxShadow: '0 2px 8px rgba(0,0,0,0.1)' }}>
+          <div style={{ background: 'linear-gradient(135deg, #3b82f6 0%, #1e40af 100%)', padding: '20px', borderRadius: '12px', boxShadow: '0 4px 12px rgba(59, 130, 246, 0.3)', color: '#fff' }}>
             <div style={{ display: 'flex', alignItems: 'center', gap: '10px', marginBottom: '10px' }}>
-              <Cloud size={24} color="#3b82f6" />
-              <h4 style={{ margin: 0, color: '#0f172a' }}>Weather</h4>
+              <Cloud size={24} color="#fff" />
+              <h4 style={{ margin: 0 }}>Weather</h4>
             </div>
             {weather ? (
               <>
-                <div style={{ fontSize: '36px', marginBottom: '10px' }}>{getWeatherIcon()}</div>
-                <p style={{ margin: '5px 0', fontSize: '14px' }}><strong>{weather.temp}°C</strong></p>
-                <p style={{ margin: '5px 0', fontSize: '12px', color: '#64748b' }}>Humidity: {weather.humidity}%</p>
-                <p style={{ margin: '5px 0', fontSize: '12px', color: '#64748b' }}>Wind: {weather.windSpeed} km/h</p>
+                <div style={{ fontSize: '42px', marginBottom: '10px' }}>{getWeatherIcon()}</div>
+                <p style={{ margin: '5px 0', fontSize: '16px', fontWeight: 'bold' }}>{weather.temp}°C</p>
+                <p style={{ margin: '5px 0', fontSize: '12px', opacity: 0.9 }}>💧 Humidity: {weather.humidity}%</p>
+                <p style={{ margin: '5px 0', fontSize: '12px', opacity: 0.9 }}>💨 Wind: {weather.windSpeed} km/h</p>
               </>
             ) : (
-              <p style={{ color: '#64748b' }}>Loading weather...</p>
+              <p style={{ color: '#e0e7ff' }}>⏳ Loading weather...</p>
             )}
           </div>
 
           {/* Distance Card */}
-          <div style={{ background: '#fff', padding: '20px', borderRadius: '12px', boxShadow: '0 2px 8px rgba(0,0,0,0.1)' }}>
+          <div style={{ background: 'linear-gradient(135deg, #8b5cf6 0%, #6d28d9 100%)', padding: '20px', borderRadius: '12px', boxShadow: '0 4px 12px rgba(139, 92, 246, 0.3)', color: '#fff' }}>
             <div style={{ display: 'flex', alignItems: 'center', gap: '10px', marginBottom: '10px' }}>
-              <Map size={24} color="#8b5cf6" />
-              <h4 style={{ margin: 0, color: '#0f172a' }}>Distance</h4>
+              <Map size={24} color="#fff" />
+              <h4 style={{ margin: 0 }}>Distance</h4>
             </div>
             {distance ? (
               <>
-                <p style={{ margin: '5px 0', fontSize: '24px', fontWeight: '800', color: '#8b5cf6' }}>{distance} km</p>
-                <p style={{ margin: '5px 0', fontSize: '12px', color: '#64748b' }}>From origin to destination</p>
+                <p style={{ margin: '5px 0', fontSize: '32px', fontWeight: '800' }}>{distance} km</p>
+                <p style={{ margin: '5px 0', fontSize: '12px', opacity: 0.9 }}>Total route distance</p>
               </>
             ) : (
-              <p style={{ color: '#64748b' }}>Calculating...</p>
+              <p style={{ color: '#e9d5ff' }}>⏳ Calculating distance...</p>
             )}
           </div>
 
           {/* Budget Card */}
-          <div style={{ background: '#fff', padding: '20px', borderRadius: '12px', boxShadow: '0 2px 8px rgba(0,0,0,0.1)' }}>
+          <div style={{ background: 'linear-gradient(135deg, #f59e0b 0%, #d97706 100%)', padding: '20px', borderRadius: '12px', boxShadow: '0 4px 12px rgba(245, 158, 11, 0.3)', color: '#fff' }}>
             <div style={{ display: 'flex', alignItems: 'center', gap: '10px', marginBottom: '10px' }}>
-              <DollarSign size={24} color="#f59e0b" />
-              <h4 style={{ margin: 0, color: '#0f172a' }}>Budget</h4>
+              <DollarSign size={24} color="#fff" />
+              <h4 style={{ margin: 0 }}>Budget</h4>
             </div>
-            <p style={{ margin: '5px 0', fontSize: '24px', fontWeight: '800', color: '#f59e0b' }}>₹{trip.totalBudget}</p>
-            <p style={{ margin: '5px 0', fontSize: '12px', color: '#64748b' }}>Total allocated budget</p>
+            <p style={{ margin: '5px 0', fontSize: '28px', fontWeight: '800' }}>₹{trip.totalBudget}</p>
+            <p style={{ margin: '5px 0', fontSize: '12px', opacity: 0.9 }}>Total allocated budget</p>
           </div>
 
           {/* Travelers Card */}
-          <div style={{ background: '#fff', padding: '20px', borderRadius: '12px', boxShadow: '0 2px 8px rgba(0,0,0,0.1)' }}>
+          <div style={{ background: 'linear-gradient(135deg, #ef4444 0%, #dc2626 100%)', padding: '20px', borderRadius: '12px', boxShadow: '0 4px 12px rgba(239, 68, 68, 0.3)', color: '#fff' }}>
             <div style={{ display: 'flex', alignItems: 'center', gap: '10px', marginBottom: '10px' }}>
-              <Users size={24} color: '#ef4444' />
-              <h4 style={{ margin: 0, color: '#0f172a' }}>Travelers</h4>
+              <Users size={24} color="#fff" />
+              <h4 style={{ margin: 0 }}>Travelers</h4>
             </div>
-            <p style={{ margin: '5px 0', fontSize: '18px', fontWeight: '800', color: '#ef4444' }}>{trip.travelers}</p>
-            <p style={{ margin: '5px 0', fontSize: '12px', color: '#64748b' }}>Number of people</p>
+            <p style={{ margin: '5px 0', fontSize: '28px', fontWeight: '800' }}>{trip.travelers}</p>
+            <p style={{ margin: '5px 0', fontSize: '12px', opacity: 0.9 }}>Number of people</p>
           </div>
 
+          {/* Status Card */}
+          <div style={{ background: 'linear-gradient(135deg, #10b981 0%, #059669 100%)', padding: '20px', borderRadius: '12px', boxShadow: '0 4px 12px rgba(16, 185, 129, 0.3)', color: '#fff' }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '10px', marginBottom: '10px' }}>
+              <Calendar size={24} color="#fff" />
+              <h4 style={{ margin: 0 }}>Status</h4>
+            </div>
+            <p style={{ margin: '5px 0', fontSize: '18px', fontWeight: 'bold', textTransform: 'capitalize' }}>{trip.status || 'planning'}</p>
+            <p style={{ margin: '5px 0', fontSize: '12px', opacity: 0.9 }}>Current trip status</p>
+          </div>
+
+        </div>
         </div>
 
         {/* Trip Details */}
@@ -332,16 +396,53 @@ const TripDetail = () => {
         </div>
 
         {/* Hotels Section */}
-        <div style={{ background: '#fff', padding: '20px', borderRadius: '12px', boxShadow: '0 2px 8px rgba(0,0,0,0.1)' }}>
+        <div style={{ marginBottom: '20px' }}>
+          <h2 style={{ color: '#0f172a', marginBottom: '15px', fontSize: '18px', fontWeight: '700' }}>🏨 Hotel Booking</h2>
+          <div style={{ background: '#fff', padding: '20px', borderRadius: '12px', boxShadow: '0 2px 8px rgba(0,0,0,0.1)' }}>
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '20px' }}>
             <h3 style={{ margin: 0, color: '#0f172a', display: 'flex', alignItems: 'center', gap: '10px' }}>
               <Hotel size={24} color="#6366f1" />
               Hotel Bookings
             </h3>
-            <button onClick={() => setShowHotelForm(!showHotelForm)} style={{ display: 'flex', alignItems: 'center', gap: '6px', padding: '8px 16px', background: '#6366f1', color: '#fff', border: 'none', borderRadius: '8px', cursor: 'pointer', fontWeight: '600' }}>
-              <Plus size={16} /> Add Hotel
-            </button>
+            <div style={{ display: 'flex', gap: '10px' }}>
+              <button onClick={searchAvailableHotels} style={{ display: 'flex', alignItems: 'center', gap: '6px', padding: '8px 16px', background: '#3b82f6', color: '#fff', border: 'none', borderRadius: '8px', cursor: 'pointer', fontWeight: '600' }}>
+                🔍 Browse Hotels
+              </button>
+              <button onClick={() => setShowHotelForm(!showHotelForm)} style={{ display: 'flex', alignItems: 'center', gap: '6px', padding: '8px 16px', background: '#6366f1', color: '#fff', border: 'none', borderRadius: '8px', cursor: 'pointer', fontWeight: '600' }}>
+                <Plus size={16} /> Add Manually
+              </button>
+            </div>
           </div>
+
+          {/* Available Hotels from Search */}
+          {showAvailableHotels && availableHotels.length > 0 && (
+            <div style={{ background: '#f0f9ff', padding: '20px', borderRadius: '8px', marginBottom: '20px', border: '2px solid #3b82f6' }}>
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '15px' }}>
+                <h4 style={{ margin: 0, color: '#1e40af' }}>Available Hotels in {trip.destination}</h4>
+                <button onClick={() => setShowAvailableHotels(false)} style={{ background: 'none', border: 'none', color: '#6b7280', cursor: 'pointer', fontSize: '18px', fontWeight: 'bold' }}>×</button>
+              </div>
+              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(280px, 1fr))', gap: '15px' }}>
+                {availableHotels.map((hotel, idx) => (
+                  <div key={idx} style={{ background: '#fff', padding: '15px', borderRadius: '8px', border: '1px solid #e0e7ff', display: 'flex', flexDirection: 'column', gap: '10px' }}>
+                    <img src={hotel.image} alt={hotel.name} style={{ width: '100%', height: '150px', objectFit: 'cover', borderRadius: '6px' }} />
+                    <div>
+                      <h5 style={{ margin: '0 0 5px 0', color: '#1e293b', fontSize: '14px', fontWeight: '700' }}>{hotel.name}</h5>
+                      <p style={{ margin: '3px 0', fontSize: '12px', color: '#64748b', display: 'flex', alignItems: 'center', gap: '4px' }}>
+                        <MapPin size={12} /> {hotel.location}
+                      </p>
+                      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginTop: '8px' }}>
+                        <span style={{ fontSize: '14px', fontWeight: '700', color: '#3b82f6' }}>₹{hotel.price}</span>
+                        <span style={{ fontSize: '12px', color: '#f59e0b' }}>⭐ {hotel.rating}</span>
+                      </div>
+                    </div>
+                    <button onClick={() => bookHotelFromSearch(hotel)} style={{ padding: '8px 12px', background: '#10b981', color: '#fff', border: 'none', borderRadius: '6px', cursor: 'pointer', fontWeight: '600', fontSize: '12px', width: '100%' }}>
+                      Book Now
+                    </button>
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
 
           {/* Add Hotel Form */}
           {showHotelForm && (
@@ -407,7 +508,7 @@ const TripDetail = () => {
               ))}
             </div>
           ) : (
-            <p style={{ color: '#64748b', textAlign: 'center', padding: '20px' }}>No hotel bookings yet. Add one now!</p>
+            <p style={{ color: '#64748b', textAlign: 'center', padding: '20px' }}>No hotel bookings yet. Browse or add one now!</p>
           )}
         </div>
 
