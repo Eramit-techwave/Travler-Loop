@@ -511,6 +511,7 @@ const TripDetail = () => {
             <p style={{ color: '#64748b', textAlign: 'center', padding: '20px' }}>No hotel bookings yet. Browse or add one now!</p>
           )}
         </div>
+        </div>
 
       </div>
     </div>
