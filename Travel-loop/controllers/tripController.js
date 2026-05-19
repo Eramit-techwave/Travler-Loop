@@ -1,5 +1,5 @@
 const Trip = require('../models/Trip');
-const fetch = require('node-fetch');
+const axios = require('axios');
 
 // ── CREATE NEW TRIP ──
 exports.createTrip = async (req, res) => {
@@ -197,8 +197,8 @@ exports.getWeather = async (req, res) => {
         try {
             // Using Open-Meteo API (free, no key required)
             const geoUrl = `https://geocoding-api.open-meteo.com/v1/search?name=${encodeURIComponent(trip.destination)}&count=1&language=en&format=json`;
-            const geoResponse = await fetch(geoUrl);
-            const locationData = await geoResponse.json();
+            const geoResponse = await axios.get(geoUrl);
+            const locationData = geoResponse.data;
 
             if (!locationData.results || locationData.results.length === 0) {
                 throw new Error("Location not found, using fallback weather");
@@ -208,8 +208,8 @@ exports.getWeather = async (req, res) => {
 
             // Get weather data
             const weatherUrl = `https://api.open-meteo.com/v1/forecast?latitude=${latitude}&longitude=${longitude}&current=temperature_2m,relative_humidity_2m,weather_code,wind_speed_10m&timezone=auto`;
-            const weatherResponse = await fetch(weatherUrl);
-            const weatherData = await weatherResponse.json();
+            const weatherResponse = await axios.get(weatherUrl);
+            const weatherData = weatherResponse.data;
 
             const weather = {
                 temp: Math.round(weatherData.current.temperature_2m),

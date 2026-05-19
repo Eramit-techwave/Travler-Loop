@@ -41,6 +41,14 @@ const TripDetail = () => {
 
   useEffect(() => {
     fetchTripDetails();
+
+    // Auto-refresh weather/distance every 5 minutes (300000ms)
+    const weatherRefreshInterval = setInterval(() => {
+      console.log('[TripDetail] Auto-refreshing weather/distance...');
+      fetchTripDetails();
+    }, 300000);
+
+    return () => clearInterval(weatherRefreshInterval);
   }, [tripId]);
 
   const fetchTripDetails = async () => {

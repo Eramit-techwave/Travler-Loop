@@ -106,6 +106,14 @@ const Dashboard = () => {
 
     if (savedUser?.username) setUserName(savedUser.username);
     fetchMyTrips();
+
+    // Auto-refresh weather/distance every 5 minutes (300000ms)
+    const weatherRefreshInterval = setInterval(() => {
+      console.log('[Dashboard] Auto-refreshing weather/distance...');
+      fetchMyTrips();
+    }, 300000);
+
+    return () => clearInterval(weatherRefreshInterval);
   }, [navigate, fetchMyTrips]);
 
   const handleInputChange = (e) => {
