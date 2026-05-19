@@ -3,7 +3,7 @@ import axios from 'axios';
 import { 
   Plane, MapPin, Calendar, LayoutDashboard, 
   Settings, LogOut, Bell, Star, 
-  Compass, Users, TrendingUp, ShieldCheck, Clock
+  Compass, Users, TrendingUp, ShieldCheck, Clock, Trash2, Eye
 } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 
@@ -24,13 +24,13 @@ const Dashboard = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [userName, setUserName] = useState('Explorer');
   const [myTrips, setMyTrips] = useState([]);
+  const [tripStats, setTripStats] = useState({ total: 0, completed: 0, ongoing: 0, planning: 0 });
   
-  // ── 1. UPDATED STATE FOR BUDGET & TRAVELERS ──
   const [bookingData, setBookingData] = useState({ 
     destination: '', 
     startDate: '', 
     travelers: '1 Person',
-    budget: '' // New Dynamic Field
+    budget: ''
   });
 
   const fetchMyTrips = useCallback(async () => {
@@ -45,6 +45,9 @@ const Dashboard = () => {
       
       if (response.data.success) {
         setMyTrips(response.data.data);
+        if (response.data.stats) {
+          setTripStats(response.data.stats);
+        }
       }
     } catch (error) {
       console.error('[Trips] Fetch error:', error);
@@ -82,6 +85,7 @@ const Dashboard = () => {
       
       const tripPayload = {
         tripName: bookingData.destination,
+        origin: bookingData.origin,
         startDate: bookingData.startDate,
         endDate: bookingData.startDate,
         description: `Trip for ${bookingData.travelers}`,
@@ -96,7 +100,7 @@ const Dashboard = () => {
 
       if (response.data.success || response.status === 201) {
         alert(`Trip to ${bookingData.destination} created successfully`);
-        setBookingData({ destination: '', startDate: '', travelers: '1 Person', budget: '' });
+        setBookingData({ origin: '', destination: '', startDate: '', travelers: '1 Person', budget: '' });
         fetchMyTrips(); 
       } else {
         alert(response.data.message || 'Booking failed');
@@ -109,10 +113,27 @@ const Dashboard = () => {
     }
   };
 
+  const handleDeleteTrip = async (tripId, e) => {
+    e.stopPropagation();
+    if (window.confirm('Are you sure you want to delete this trip?')) {
+      try {
+        const token = localStorage.getItem('token');
+        const apiUrl = import.meta.env.VITE_API_URL || 'http://localhost:5000';
+        await axios.delete(`${apiUrl}/api/trips/${tripId}`, {
+          headers: { Authorization: `Bearer ${token}` }
+        });
+        alert('Trip deleted!');
+        fetchMyTrips();
+      } catch (error) {
+        alert('Failed to delete trip');
+      }
+    }
+  };
+
   const stats = [
-    { label: 'Completed', value: '12', icon: ShieldCheck, color: '#10B981' },
-    { label: 'Upcoming', value: myTrips.length.toString().padStart(2, '0'), icon: Plane, color: '#3B82F6' },
-    { label: 'Points', value: '2,450', icon: Star, color: '#F59E0B' },
+    { label: 'Total Trips', value: tripStats.total.toString().padStart(2, '0'), icon: Plane, color: '#3B82F6' },
+    { label: 'Completed', value: tripStats.completed.toString().padStart(2, '0'), icon: ShieldCheck, color: '#10B981' },
+    { label: 'Planning', value: tripStats.planning.toString().padStart(2, '0'), icon: Calendar, color: '#F59E0B' },
   ];
 
   return (
@@ -167,9 +188,16 @@ const Dashboard = () => {
             <div style={{ width: 4, height: 24, background: T.accent, borderRadius: 2 }}></div>
             <h3 style={{ fontSize: '20px', fontWeight: 800, color: T.text }}>Create New Itinerary</h3>
           </div>
-          <form onSubmit={handleBooking} style={{ display: 'grid', gridTemplateColumns: '1.2fr 1fr 1fr 1fr 0.8fr', gap: '20px' }}>
+          <form onSubmit={handleBooking} style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr 1fr 1fr 0.8fr', gap: '20px' }}>
             <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
-              <label style={{ fontSize: '12px', fontWeight: 800, color: T.muted }}>DESTINATION</label>
+              <label style={{ fontSize: '12px', fontWeight: 800, color: T.muted }}>FROM</label>
+              <div style={{ display: 'flex', alignItems: 'center', gap: 12, background: '#F8FAFC', padding: '16px 20px', borderRadius: '20px', border: '1px solid #E2E8F0' }}>
+                <MapPin size={18} color={T.accent} />
+                <input required name="origin" type="text" value={bookingData.origin} onChange={handleInputChange} placeholder="Starting point?" style={{ background: 'none', border: 'none', outline: 'none', fontSize: '14px', fontWeight: 600, width: '100%' }} />
+              </div>
+            </div>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
+              <label style={{ fontSize: '12px', fontWeight: 800, color: T.muted }}>TO</label>
               <div style={{ display: 'flex', alignItems: 'center', gap: 12, background: '#F8FAFC', padding: '16px 20px', borderRadius: '20px', border: '1px solid #E2E8F0' }}>
                 <MapPin size={18} color={T.accent} />
                 <input required name="destination" type="text" value={bookingData.destination} onChange={handleInputChange} placeholder="Where to?" style={{ background: 'none', border: 'none', outline: 'none', fontSize: '14px', fontWeight: 600, width: '100%' }} />
@@ -191,7 +219,6 @@ const Dashboard = () => {
                 </select>
               </div>
             </div>
-            {/* New Budget Input */}
             <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
               <label style={{ fontSize: '12px', fontWeight: 800, color: T.muted }}>BUDGET (₹)</label>
               <div style={{ display: 'flex', alignItems: 'center', gap: 12, background: '#F8FAFC', padding: '16px 20px', borderRadius: '20px', border: '1px solid #E2E8F0' }}>
@@ -230,13 +257,24 @@ const Dashboard = () => {
           </div>
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(350px, 1fr))', gap: '25px' }}>
             {myTrips.length > 0 ? myTrips.map((trip, idx) => (
-              <div key={idx} style={{ background: T.white, borderRadius: '28px', padding: '25px', border: '1px solid #f1f5f9', boxShadow: '0 10px 30px rgba(0,0,0,0.02)' }}>
-                <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '15px' }}>
-                  <h4 style={{ fontWeight: 800, fontSize: '17px' }}>{trip.tripName}</h4>
+              <div key={idx} onClick={() => navigate(`/trip/${trip._id}`)} style={{ background: T.white, borderRadius: '28px', padding: '25px', border: '1px solid #f1f5f9', boxShadow: '0 10px 30px rgba(0,0,0,0.02)', transition: 'all 0.3s', cursor: 'pointer' }} onMouseEnter={e => e.currentTarget.style.boxShadow = '0 20px 40px rgba(0,0,0,0.08)'} onMouseLeave={e => e.currentTarget.style.boxShadow = '0 10px 30px rgba(0,0,0,0.02)'}}>
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'start', marginBottom: '15px' }}>
+                  <div>
+                    <h4 style={{ fontWeight: 800, fontSize: '17px', margin: 0, marginBottom: '5px' }}>{trip.tripName}</h4>
+                    <span style={{ display: 'inline-block', background: trip.status === 'completed' ? '#dcfce7' : trip.status === 'ongoing' ? '#dbeafe' : '#fef3c7', color: trip.status === 'completed' ? '#15803d' : trip.status === 'ongoing' ? '#0c4a6e' : '#92400e', padding: '3px 8px', borderRadius: '6px', fontSize: '11px', fontWeight: '700', textTransform: 'capitalize' }}>{trip.status || 'planning'}</span>
+                  </div>
                   <div style={{ background: '#F0F9FF', padding: '6px 12px', borderRadius: '10px', fontSize: '13px', fontWeight: 800, color: T.accent }}>₹{trip.totalBudget}</div>
                 </div>
-                <p style={{ fontSize: '12px', color: T.muted, marginBottom: '10px' }}>📅 {new Date(trip.startDate).toLocaleDateString()}</p>
-                <p style={{ fontSize: '14px', color: T.muted, lineHeight: '1.5' }}>{trip.description}</p>
+                <p style={{ fontSize: '12px', color: T.muted, marginBottom: '8px' }}>📅 {new Date(trip.startDate).toLocaleDateString()}</p>
+                <p style={{ fontSize: '12px', color: T.muted, marginBottom: '15px', display: '-webkit-box', WebkitLineClamp: '2', WebkitBoxOrient: 'vertical', overflow: 'hidden' }}>{trip.description || 'No description added'}</p>
+                <div style={{ display: 'flex', gap: '8px', borderTop: '1px solid #f1f5f9', paddingTop: '15px' }}>
+                  <button onClick={() => navigate(`/trip/${trip._id}`)} style={{ flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '6px', padding: '10px', background: T.accent, color: '#fff', border: 'none', borderRadius: '10px', cursor: 'pointer', fontWeight: '600', fontSize: '12px' }}>
+                    <Eye size={14} /> Details
+                  </button>
+                  <button onClick={(e) => handleDeleteTrip(trip._id, e)} style={{ padding: '10px 12px', background: '#fee2e2', border: '1px solid #fecaca', color: '#dc2626', borderRadius: '10px', cursor: 'pointer', fontWeight: '600', fontSize: '12px', display: 'flex', alignItems: 'center', gap: '4px' }}>
+                    <Trash2 size={14} />
+                  </button>
+                </div>
               </div>
             )) : (
               <div style={{ gridColumn: '1/-1', textAlign: 'center', padding: '40px', background: '#fff', borderRadius: '32px', border: '2px dashed #E2E8F0', color: T.muted }}>
