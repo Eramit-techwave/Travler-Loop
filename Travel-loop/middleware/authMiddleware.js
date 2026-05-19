@@ -1,7 +1,7 @@
 const jwt = require('jsonwebtoken');
 const User = require('../models/User');
 
-const JWT_SECRET = 'traveloop_secret_key';
+const JWT_SECRET = process.env.JWT_SECRET || 'traveloop_secret_key';
 
 /**
  * Middleware to protect routes with JWT authentication

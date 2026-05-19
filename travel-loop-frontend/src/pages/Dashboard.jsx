@@ -38,7 +38,8 @@ const Dashboard = () => {
       const token = localStorage.getItem('token');
       if (!token) return;
 
-      const response = await axios.get('http://localhost:5000/api/trips/my-trips', {
+      const apiUrl = import.meta.env.VITE_API_URL || 'http://localhost:5000';
+      const response = await axios.get(`${apiUrl}/api/trips/my-trips`, {
         headers: { Authorization: `Bearer ${token}` }
       });
       
@@ -88,7 +89,8 @@ const Dashboard = () => {
         totalBudget: Number(bookingData.budget) || 0
       };
 
-      const response = await axios.post('http://localhost:5000/api/trips/add', tripPayload, {
+      const apiUrl = import.meta.env.VITE_API_URL || 'http://localhost:5000';
+      const response = await axios.post(`${apiUrl}/api/trips/add`, tripPayload, {
         headers: { Authorization: `Bearer ${token}` }
       });
 

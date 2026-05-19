@@ -2,7 +2,7 @@ const User = require('../models/User');
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 
-const JWT_SECRET = 'traveloop_secret_key';
+const JWT_SECRET = process.env.JWT_SECRET || 'traveloop_secret_key';
 
 const createToken = (userId) => jwt.sign({ id: userId }, JWT_SECRET, { expiresIn: '1d' });
 
@@ -67,6 +67,7 @@ exports.signup = async (req, res) => {
  */
 exports.login = async (req, res) => {
     try {
+        console.log('[Auth] Login request:', { email: req.body.email });
         const { email, password } = req.body;
 
         if (!email || !password) {
@@ -76,9 +77,22 @@ exports.login = async (req, res) => {
             });
         }
 
+        console.log('[Auth] Finding user with email:', email);
         const user = await User.findOne({ email }).select('+password');
+        console.log('[Auth] User found:', user ? 'yes' : 'no');
 
-        if (!user || !(await bcrypt.compare(password, user.password))) {
+        if (!user) {
+            return res.status(401).json({
+                success: false,
+                message: 'Invalid email or password'
+            });
+        }
+
+        console.log('[Auth] Comparing passwords');
+        const isPasswordValid = await bcrypt.compare(password, user.password);
+        console.log('[Auth] Password valid:', isPasswordValid);
+
+        if (!isPasswordValid) {
             return res.status(401).json({
                 success: false,
                 message: 'Invalid email or password'
@@ -97,7 +111,11 @@ exports.login = async (req, res) => {
             }
         });
     } catch (err) {
-        console.error('[Auth] Login error:', err);
+        console.error('[Auth] Login error - Full details:', {
+            message: err.message,
+            stack: err.stack,
+            name: err.name
+        });
         res.status(500).json({
             success: false,
             message: 'Login failed. Please try again.'

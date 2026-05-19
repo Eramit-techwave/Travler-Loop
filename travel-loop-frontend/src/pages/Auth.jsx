@@ -183,34 +183,28 @@ const handleAction = async (e) => {
   e.preventDefault();
   setIsLoading(true);
 
-  // Path fix
   const path = isLogin ? 'login' : 'register';
-  const finalURL = `https://travler-loop.onrender.com/api/auth/${path}`;
+  const apiUrl = import.meta.env.VITE_API_URL || 'http://localhost:5000';
+  const finalURL = `${apiUrl}/api/auth/${path}`;
 
   try {
     const response = await axios.post(finalURL, formData);
     
-    // Check karo 'success' true hai ya nahi
     if (response.data.success) {
       alert(isLogin ? "Welcome back!" : "Account created!");
 
-      // Login ke case mein data save karna zaroori hai
       if (isLogin) {
-        // Token aur User details local storage mein daalo
         localStorage.setItem('token', response.data.token);
         localStorage.setItem('user', JSON.stringify(response.data.user));
-        
-        // redirect to dashboard
-        window.location.href = '/dashboard'; 
-        // Note: Agar 'navigate' kaam nahi kar raha, toh 'window.location.href' pakka chalega
+        navigate('/dashboard');
       } else {
-        // Signup ke baad login page par bhejo
-        setIsLogin(true); 
+        setIsLogin(true);
+        setFormData({ username: '', email: '', password: '' });
       }
     }
   } catch (error) {
-    console.error("Login Error:", error.response);
-    alert(error.response?.data?.message || "Login fail ho gaya!");
+    console.error("Auth Error:", error.response);
+    alert(error.response?.data?.message || (isLogin ? "Login failed!" : "Registration failed!"));
   } finally {
     setIsLoading(false);
   }

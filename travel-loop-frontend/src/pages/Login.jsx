@@ -114,7 +114,8 @@ const Login = () => {
         if (!result?.user) return;
 
         const user = result.user;
-        const response = await axios.post('http://localhost:5000/api/auth/google', {
+        const apiUrl = import.meta.env.VITE_API_URL || 'http://localhost:5000';
+        const response = await axios.post(`${apiUrl}/api/auth/google`, {
           username: user.displayName,
           email: user.email,
           profilePic: user.photoURL,
@@ -132,6 +133,7 @@ const Login = () => {
         }
       } catch (error) {
         console.error('[Auth] Google login error:', error);
+        alert('Google login failed. Please try again.');
       }
     };
 
@@ -162,11 +164,12 @@ const Login = () => {
 
     setIsLoading(true);
     try {
-      const res = await axios.post('http://localhost:5000/api/auth/login', { email, password });
+      const apiUrl = import.meta.env.VITE_API_URL || 'http://localhost:5000';
+      const res = await axios.post(`${apiUrl}/api/auth/login`, { email, password });
       if (res.data.success) {
         localStorage.setItem('token', res.data.token);
         localStorage.setItem('user', JSON.stringify(res.data.user));
-        setTimeout(() => navigate('/dashboard'), 800);
+        navigate('/dashboard');
       } else {
         alert(res.data.message || 'Login failed');
       }

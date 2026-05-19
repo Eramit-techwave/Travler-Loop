@@ -19,7 +19,7 @@ app.use('/api/auth', authRoutes);
 app.use('/api/trips', tripRoutes);
 
 // Database Connection
-mongoose.connect('mongodb://127.0.0.1:27017/traveloopDB')
+mongoose.connect(process.env.MONGODB_URI || 'mongodb://127.0.0.1:27017/traveloopDB')
     .then(() => console.log('[DB] Connected successfully'))
     .catch(err => console.error('[DB] Connection failed:', err));
 
