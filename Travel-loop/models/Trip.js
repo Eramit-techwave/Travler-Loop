@@ -10,10 +10,23 @@ const tripSchema = new mongoose.Schema({
         type: String,
         required: [true, "Trip ka naam zaroori hai"]
     },
+    origin: {
+        type: String,
+        default: 'Current Location'
+    },
+    destination: {
+        type: String,
+        required: true
+    },
     startDate: { type: Date, required: true },
     endDate: { type: Date, required: true },
     description: String,
-    // Itinerary Builder data (Checklist Point 1 & 3)
+    status: {
+        type: String,
+        enum: ['planning', 'ongoing', 'completed', 'cancelled'],
+        default: 'planning'
+    },
+    // Itinerary Builder data
     stops: [{
         city: String,
         arrivalDate: Date,
@@ -26,6 +39,35 @@ const tripSchema = new mongoose.Schema({
     totalBudget: {
         type: Number,
         default: 0
+    },
+    totalDistance: {
+        type: Number,
+        default: 0,
+        description: 'Total distance in km'
+    },
+    travelers: {
+        type: String,
+        default: '1 Person'
+    },
+    hotels: [{
+        name: String,
+        location: String,
+        checkIn: Date,
+        checkOut: Date,
+        price: Number,
+        rating: Number,
+        bookedDate: Date
+    }],
+    weather: {
+        temp: Number,
+        condition: String,
+        humidity: Number,
+        windSpeed: Number,
+        lastUpdated: Date
+    },
+    createdAt: {
+        type: Date,
+        default: Date.now
     }
 });
 
