@@ -318,14 +318,6 @@ exports.calculateDistance = async (req, res) => {
         });
     }
 };
-        });
-    } catch (error) {
-        res.status(500).json({
-            success: false,
-            message: "Failed to calculate distance"
-        });
-    }
-};
 
 // ── ADD HOTEL BOOKING ──
 exports.addHotelBooking = async (req, res) => {

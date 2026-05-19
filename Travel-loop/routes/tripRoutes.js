@@ -14,14 +14,8 @@ router.get('/my-trips', protect, tripController.getMyTrips);
 // GET STATS: GET /api/trips/stats
 router.get('/stats', protect, tripController.getTripStats);
 
-// GET TRIP DETAILS: GET /api/trips/:tripId
-router.get('/:tripId', protect, tripController.getTripDetails);
-
-// UPDATE: PUT /api/trips/:tripId
-router.put('/:tripId', protect, tripController.updateTrip);
-
-// DELETE: DELETE /api/trips/:tripId
-router.delete('/:tripId', protect, tripController.deleteTrip);
+// SEARCH HOTELS: GET /api/trips/hotels/search/:destination (MUST be before /:tripId)
+router.get('/hotels/search/:destination', protect, tripController.searchHotels);
 
 // WEATHER: GET /api/trips/:tripId/weather
 router.get('/:tripId/weather', protect, tripController.getWeather);
@@ -35,7 +29,13 @@ router.post('/:tripId/hotels', protect, tripController.addHotelBooking);
 // REMOVE HOTEL: DELETE /api/trips/:tripId/hotels/:hotelId
 router.delete('/:tripId/hotels/:hotelId', protect, tripController.removeHotelBooking);
 
-// SEARCH HOTELS: GET /api/trips/hotels/search/:destination
-router.get('/hotels/search/:destination', protect, tripController.searchHotels);
+// GET TRIP DETAILS: GET /api/trips/:tripId
+router.get('/:tripId', protect, tripController.getTripDetails);
+
+// UPDATE: PUT /api/trips/:tripId
+router.put('/:tripId', protect, tripController.updateTrip);
+
+// DELETE: DELETE /api/trips/:tripId
+router.delete('/:tripId', protect, tripController.deleteTrip);
 
 module.exports = router;
