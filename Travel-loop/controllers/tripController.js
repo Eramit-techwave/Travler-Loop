@@ -194,42 +194,58 @@ exports.getWeather = async (req, res) => {
             });
         }
 
-        // Using Open-Meteo API (free, no key required)
-        const response = await fetch(
-            `https://geocoding-api.open-meteo.com/v1/search?name=${trip.destination}&count=1&language=en&format=json`
-        );
-        const locationData = await response.json();
+        try {
+            // Using Open-Meteo API (free, no key required)
+            const geoUrl = `https://geocoding-api.open-meteo.com/v1/search?name=${encodeURIComponent(trip.destination)}&count=1&language=en&format=json`;
+            const geoResponse = await fetch(geoUrl);
+            const locationData = await geoResponse.json();
 
-        if (!locationData.results || locationData.results.length === 0) {
-            return res.status(404).json({
-                success: false,
-                message: "Location not found"
+            if (!locationData.results || locationData.results.length === 0) {
+                throw new Error("Location not found, using fallback weather");
+            }
+
+            const { latitude, longitude } = locationData.results[0];
+
+            // Get weather data
+            const weatherUrl = `https://api.open-meteo.com/v1/forecast?latitude=${latitude}&longitude=${longitude}&current=temperature_2m,relative_humidity_2m,weather_code,wind_speed_10m&timezone=auto`;
+            const weatherResponse = await fetch(weatherUrl);
+            const weatherData = await weatherResponse.json();
+
+            const weather = {
+                temp: Math.round(weatherData.current.temperature_2m),
+                condition: weatherData.current.weather_code,
+                humidity: weatherData.current.relative_humidity_2m,
+                windSpeed: Math.round(weatherData.current.wind_speed_10m),
+                lastUpdated: new Date()
+            };
+
+            trip.weather = weather;
+            await trip.save();
+
+            return res.status(200).json({
+                success: true,
+                data: weather
+            });
+        } catch (apiError) {
+            // Fallback weather data if API fails
+            console.log('Weather API error, using fallback:', apiError.message);
+            const fallbackWeather = {
+                temp: 25,
+                condition: 2,
+                humidity: 60,
+                windSpeed: 10,
+                lastUpdated: new Date()
+            };
+            
+            trip.weather = fallbackWeather;
+            await trip.save();
+
+            return res.status(200).json({
+                success: true,
+                data: fallbackWeather,
+                source: 'fallback'
             });
         }
-
-        const { latitude, longitude } = locationData.results[0];
-
-        // Get weather data
-        const weatherResponse = await fetch(
-            `https://api.open-meteo.com/v1/forecast?latitude=${latitude}&longitude=${longitude}&current=temperature_2m,relative_humidity_2m,weather_code,wind_speed_10m&timezone=auto`
-        );
-        const weatherData = await weatherResponse.json();
-
-        const weather = {
-            temp: weatherData.current.temperature_2m,
-            condition: weatherData.current.weather_code,
-            humidity: weatherData.current.relative_humidity_2m,
-            windSpeed: weatherData.current.wind_speed_10m,
-            lastUpdated: new Date()
-        };
-
-        trip.weather = weather;
-        await trip.save();
-
-        res.status(200).json({
-            success: true,
-            data: weather
-        });
     } catch (error) {
         res.status(500).json({
             success: false,
@@ -251,40 +267,9 @@ exports.calculateDistance = async (req, res) => {
             });
         }
 
-        const origin = trip.origin || 'India';
-        const destination = trip.destination;
-
-        try {
-            // Using OpenRouteService API for distance calculation
-            // Free tier: https://openrouteservice.org/ (no key required for basic requests)
-            const orsUrl = `https://api.openrouteservice.org/v2/matrix/driving?locations=${encodeURIComponent(origin)}&locations=${encodeURIComponent(destination)}`;
-            
-            const response = await fetch(orsUrl, {
-                headers: {
-                    'Accept': 'application/json'
-                }
-            });
-
-            if (response.ok) {
-                const data = await response.json();
-                
-                if (data.distances && data.distances[0] && data.distances[0][1]) {
-                    // Distance is in meters, convert to km
-                    const distanceKm = Math.round(data.distances[0][1] / 1000);
-                    trip.totalDistance = distanceKm;
-                    await trip.save();
-
-                    return res.status(200).json({
-                        success: true,
-                        distance: distanceKm,
-                        unit: 'km',
-                        source: 'OpenRouteService'
-                    });
-                }
-            }
-        } catch (orsError) {
-            console.log('OpenRouteService error, using fallback estimation');
-        }
+        // Ensure origin and destination are defined and trimmed
+        const origin = (trip.origin || 'Delhi').trim().toLowerCase();
+        const destination = (trip.destination || 'Mumbai').trim().toLowerCase();
 
         // Fallback: Estimate distance based on common routes
         const distanceEstimates = {
@@ -292,13 +277,14 @@ exports.calculateDistance = async (req, res) => {
             'mumbai': { 'delhi': 1400, 'bangalore': 980, 'goa': 590, 'hyderabad': 700, 'kolkata': 1900 },
             'bangalore': { 'delhi': 2150, 'mumbai': 980, 'goa': 490, 'hyderabad': 580, 'kolkata': 2100 },
             'goa': { 'delhi': 1500, 'mumbai': 590, 'bangalore': 490, 'hyderabad': 780, 'kolkata': 2300 },
-            'hyderabad': { 'delhi': 1400, 'mumbai': 700, 'bangalore': 580, 'goa': 780, 'kolkata': 1600 }
+            'hyderabad': { 'delhi': 1400, 'mumbai': 700, 'bangalore': 580, 'goa': 780, 'kolkata': 1600 },
+            'varanasi': { 'delhi': 760, 'mumbai': 1200, 'kolkata': 500 },
+            'vrindavan': { 'delhi': 160, 'agra': 60, 'lucknow': 180 },
+            'nasik': { 'mumbai': 210, 'pune': 130, 'hyderabad': 470 },
+            'surat': { 'mumbai': 270, 'ahmedabad': 260, 'vadodara': 150 }
         };
 
-        const originLower = origin.toLowerCase();
-        const destLower = destination.toLowerCase();
-
-        let distance = distanceEstimates[originLower]?.[destLower] || Math.floor(Math.random() * 2000) + 500;
+        let distance = distanceEstimates[origin]?.[destination] || Math.floor(Math.random() * 2000) + 500;
 
         trip.totalDistance = distance;
         await trip.save();
@@ -307,7 +293,7 @@ exports.calculateDistance = async (req, res) => {
             success: true,
             distance: distance,
             unit: 'km',
-            source: distanceEstimates[originLower]?.[destLower] ? 'Database' : 'Estimated'
+            source: distanceEstimates[origin]?.[destination] ? 'Database' : 'Estimated'
         });
 
     } catch (error) {

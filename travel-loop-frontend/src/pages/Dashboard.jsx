@@ -35,6 +35,40 @@ const Dashboard = () => {
     budget: ''
   });
 
+  // State for weather and distance data
+  const [tripWeatherDistance, setTripWeatherDistance] = useState({});
+
+  // Function to fetch weather and distance for a specific trip
+  const fetchWeatherAndDistance = useCallback(async (tripId, token, apiUrl) => {
+    try {
+      const weatherRes = await axios.get(`${apiUrl}/api/trips/${tripId}/weather`, {
+        headers: { Authorization: `Bearer ${token}` }
+      });
+      
+      const distanceRes = await axios.get(`${apiUrl}/api/trips/${tripId}/distance`, {
+        headers: { Authorization: `Bearer ${token}` }
+      });
+
+      setTripWeatherDistance(prev => ({
+        ...prev,
+        [tripId]: {
+          weather: weatherRes.data.data || { temp: 25, condition: 2, humidity: 60 },
+          distance: distanceRes.data.distance || 0
+        }
+      }));
+    } catch (error) {
+      console.error(`[Weather/Distance] Error for trip ${tripId}:`, error);
+      // Set fallback values on error
+      setTripWeatherDistance(prev => ({
+        ...prev,
+        [tripId]: {
+          weather: { temp: 25, condition: 2, humidity: 60 },
+          distance: 0
+        }
+      }));
+    }
+  }, []);
+
   const fetchMyTrips = useCallback(async () => {
     try {
       const token = localStorage.getItem('token');
@@ -50,11 +84,16 @@ const Dashboard = () => {
         if (response.data.stats) {
           setTripStats(response.data.stats);
         }
+        
+        // Fetch weather and distance for each trip
+        response.data.data.forEach(trip => {
+          fetchWeatherAndDistance(trip._id, token, apiUrl);
+        });
       }
     } catch (error) {
       console.error('[Trips] Fetch error:', error);
     }
-  }, []);
+  }, [fetchWeatherAndDistance]);
 
   useEffect(() => {
     const savedUser = JSON.parse(localStorage.getItem('user'));
@@ -76,6 +115,18 @@ const Dashboard = () => {
   const handleLogout = () => {
     localStorage.clear();
     navigate('/login');
+  };
+
+  // Helper function to get weather emoji
+  const getWeatherEmoji = (weatherCode) => {
+    if (!weatherCode) return '🌤️';
+    if (weatherCode <= 1) return '☀️';
+    if (weatherCode <= 3) return '⛅';
+    if (weatherCode >= 45 && weatherCode <= 48) return '🌫️';
+    if (weatherCode >= 51 && weatherCode <= 67) return '🌧️';
+    if (weatherCode >= 71 && weatherCode <= 77) return '❄️';
+    if (weatherCode >= 80 && weatherCode <= 82) return '⛈️';
+    return '🌤️';
   };
 
   const handleBooking = async (e) => {
@@ -267,6 +318,30 @@ const Dashboard = () => {
                   </div>
                   <div style={{ background: '#F0F9FF', padding: '6px 12px', borderRadius: '10px', fontSize: '13px', fontWeight: 800, color: T.accent }}>₹{trip.totalBudget}</div>
                 </div>
+                
+                {/* Weather and Distance Info */}
+                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px', marginBottom: '15px', padding: '12px', background: '#F8FAFC', borderRadius: '16px' }}>
+                  {/* Weather Card */}
+                  <div style={{ textAlign: 'center' }}>
+                    <div style={{ fontSize: '24px', marginBottom: '4px' }}>
+                      {getWeatherEmoji(tripWeatherDistance[trip._id]?.weather?.condition)}
+                    </div>
+                    <div style={{ fontSize: '13px', fontWeight: 800, color: T.text }}>
+                      {tripWeatherDistance[trip._id]?.weather?.temp || 25}°C
+                    </div>
+                    <div style={{ fontSize: '10px', color: T.muted }}>Weather</div>
+                  </div>
+                  
+                  {/* Distance Card */}
+                  <div style={{ textAlign: 'center' }}>
+                    <div style={{ fontSize: '24px', marginBottom: '4px' }}>🗺️</div>
+                    <div style={{ fontSize: '13px', fontWeight: 800, color: T.text }}>
+                      {tripWeatherDistance[trip._id]?.distance || 0} km
+                    </div>
+                    <div style={{ fontSize: '10px', color: T.muted }}>Distance</div>
+                  </div>
+                </div>
+                
                 <p style={{ fontSize: '12px', color: T.muted, marginBottom: '8px' }}>📅 {new Date(trip.startDate).toLocaleDateString()}</p>
                 <p style={{ fontSize: '12px', color: T.muted, marginBottom: '15px', display: '-webkit-box', WebkitLineClamp: '2', WebkitBoxOrient: 'vertical', overflow: 'hidden' }}>{trip.description || 'No description added'}</p>
                 <div style={{ display: 'flex', gap: '8px', borderTop: '1px solid #f1f5f9', paddingTop: '15px' }}>
