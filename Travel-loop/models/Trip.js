@@ -59,11 +59,20 @@ const tripSchema = new mongoose.Schema({
         bookedDate: Date
     }],
     weather: {
-        temp: Number,
-        condition: Number,
-        humidity: Number,
-        windSpeed: Number,
-        lastUpdated: Date
+        type: {
+            temp: Number,
+            condition: Number,
+            humidity: Number,
+            windSpeed: Number,
+            lastUpdated: Date
+        },
+        default: () => ({
+            temp: 25,
+            condition: 2,
+            humidity: 60,
+            windSpeed: 10,
+            lastUpdated: new Date()
+        })
     },
     createdAt: {
         type: Date,

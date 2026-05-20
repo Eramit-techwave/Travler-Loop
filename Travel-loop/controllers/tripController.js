@@ -194,59 +194,54 @@ exports.getWeather = async (req, res) => {
             });
         }
 
+        let weather = {
+            temp: 25,
+            condition: 2,
+            humidity: 60,
+            windSpeed: 10,
+            lastUpdated: new Date()
+        };
+
         try {
             // Using Open-Meteo API (free, no key required)
             const geoUrl = `https://geocoding-api.open-meteo.com/v1/search?name=${encodeURIComponent(trip.destination)}&count=1&language=en&format=json`;
             const geoResponse = await axios.get(geoUrl);
             const locationData = geoResponse.data;
 
-            if (!locationData.results || locationData.results.length === 0) {
-                throw new Error("Location not found, using fallback weather");
+            if (locationData.results && locationData.results.length > 0) {
+                const { latitude, longitude } = locationData.results[0];
+
+                // Get weather data
+                const weatherUrl = `https://api.open-meteo.com/v1/forecast?latitude=${latitude}&longitude=${longitude}&current=temperature_2m,relative_humidity_2m,weather_code,wind_speed_10m&timezone=auto`;
+                const weatherResponse = await axios.get(weatherUrl);
+                const weatherData = weatherResponse.data;
+
+                if (weatherData && weatherData.current) {
+                    weather = {
+                        temp: Math.round(weatherData.current.temperature_2m || 25),
+                        condition: weatherData.current.weather_code || 2,
+                        humidity: weatherData.current.relative_humidity_2m || 60,
+                        windSpeed: Math.round(weatherData.current.wind_speed_10m || 10),
+                        lastUpdated: new Date()
+                    };
+                }
             }
-
-            const { latitude, longitude } = locationData.results[0];
-
-            // Get weather data
-            const weatherUrl = `https://api.open-meteo.com/v1/forecast?latitude=${latitude}&longitude=${longitude}&current=temperature_2m,relative_humidity_2m,weather_code,wind_speed_10m&timezone=auto`;
-            const weatherResponse = await axios.get(weatherUrl);
-            const weatherData = weatherResponse.data;
-
-            const weather = {
-                temp: Math.round(weatherData.current.temperature_2m),
-                condition: weatherData.current.weather_code,
-                humidity: weatherData.current.relative_humidity_2m,
-                windSpeed: Math.round(weatherData.current.wind_speed_10m),
-                lastUpdated: new Date()
-            };
-
-            trip.weather = weather;
-            await trip.save();
-
-            return res.status(200).json({
-                success: true,
-                data: weather
-            });
         } catch (apiError) {
-            // Fallback weather data if API fails
-            console.log('Weather API error, using fallback:', apiError.message);
-            const fallbackWeather = {
-                temp: 25,
-                condition: 2,
-                humidity: 60,
-                windSpeed: 10,
-                lastUpdated: new Date()
-            };
-            
-            trip.weather = fallbackWeather;
-            await trip.save();
-
-            return res.status(200).json({
-                success: true,
-                data: fallbackWeather,
-                source: 'fallback'
-            });
+            // Log error but continue with fallback
+            console.log('Weather API error:', apiError.message, 'Using fallback for:', trip.destination);
         }
+
+        // Always save the weather data
+        trip.weather = weather;
+        await trip.save();
+
+        return res.status(200).json({
+            success: true,
+            data: weather
+        });
+
     } catch (error) {
+        console.error("Weather controller error:", error.message);
         res.status(500).json({
             success: false,
             message: `Failed to fetch weather: ${error.message}`
@@ -273,15 +268,22 @@ exports.calculateDistance = async (req, res) => {
 
         // Fallback: Estimate distance based on common routes
         const distanceEstimates = {
-            'delhi': { 'mumbai': 1400, 'bangalore': 2150, 'goa': 1500, 'hyderabad': 1400, 'kolkata': 1500, 'jaipur': 250 },
-            'mumbai': { 'delhi': 1400, 'bangalore': 980, 'goa': 590, 'hyderabad': 700, 'kolkata': 1900 },
-            'bangalore': { 'delhi': 2150, 'mumbai': 980, 'goa': 490, 'hyderabad': 580, 'kolkata': 2100 },
-            'goa': { 'delhi': 1500, 'mumbai': 590, 'bangalore': 490, 'hyderabad': 780, 'kolkata': 2300 },
-            'hyderabad': { 'delhi': 1400, 'mumbai': 700, 'bangalore': 580, 'goa': 780, 'kolkata': 1600 },
-            'varanasi': { 'delhi': 760, 'mumbai': 1200, 'kolkata': 500 },
-            'vrindavan': { 'delhi': 160, 'agra': 60, 'lucknow': 180 },
-            'nasik': { 'mumbai': 210, 'pune': 130, 'hyderabad': 470 },
-            'surat': { 'mumbai': 270, 'ahmedabad': 260, 'vadodara': 150 }
+            'delhi': { 'mumbai': 1400, 'bangalore': 2150, 'goa': 1500, 'hyderabad': 1400, 'kolkata': 1500, 'jaipur': 250, 'agra': 206, 'varanasi': 760, 'vrindavan': 160, 'mathura': 145 },
+            'mumbai': { 'delhi': 1400, 'bangalore': 980, 'goa': 590, 'hyderabad': 700, 'kolkata': 1900, 'pune': 180, 'surat': 270, 'nasik': 210 },
+            'bangalore': { 'delhi': 2150, 'mumbai': 980, 'goa': 490, 'hyderabad': 580, 'kolkata': 2100, 'coorg': 260, 'mysore': 139 },
+            'goa': { 'delhi': 1500, 'mumbai': 590, 'bangalore': 490, 'hyderabad': 780, 'kolkata': 2300, 'pune': 600 },
+            'hyderabad': { 'delhi': 1400, 'mumbai': 700, 'bangalore': 580, 'goa': 780, 'kolkata': 1600, 'pune': 570 },
+            'varanasi': { 'delhi': 760, 'mumbai': 1200, 'kolkata': 500, 'agra': 330, 'vrindavan': 900 },
+            'vrindavan': { 'delhi': 160, 'agra': 60, 'lucknow': 180, 'mathura': 58, 'varanasi': 900 },
+            'mathura': { 'delhi': 145, 'vrindavan': 58, 'agra': 60, 'jaipur': 240, 'varanasi': 600 },
+            'agra': { 'delhi': 206, 'mathura': 60, 'vrindavan': 60, 'jaipur': 250, 'lucknow': 400 },
+            'jaipur': { 'delhi': 250, 'agra': 250, 'mathura': 240, 'udaipur': 445, 'pushkar': 150 },
+            'nasik': { 'mumbai': 210, 'pune': 130, 'hyderabad': 470, 'shirdi': 80 },
+            'surat': { 'mumbai': 270, 'ahmedabad': 260, 'vadodara': 150 },
+            'kolkata': { 'delhi': 1500, 'mumbai': 1900, 'bangalore': 2100, 'hyderabad': 1600, 'varanasi': 500, 'darjeeling': 600 },
+            'pune': { 'mumbai': 180, 'nasik': 130, 'goa': 600, 'hyderabad': 570, 'bangalore': 650 },
+            'udaipur': { 'jaipur': 445, 'delhi': 700, 'mumbai': 850, 'ahmedabad': 395 },
+            'pushkar': { 'jaipur': 150, 'delhi': 400, 'udaipur': 290 }
         };
 
         let distance = distanceEstimates[origin]?.[destination] || Math.floor(Math.random() * 2000) + 500;
