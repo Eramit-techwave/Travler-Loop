@@ -1,22 +1,11 @@
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useEffect, useCallback, useRef } from 'react';
 import axios from 'axios';
 import { 
   Plane, MapPin, Calendar, LayoutDashboard, 
-  Settings, LogOut, Bell, Star, 
-  Compass, Users, TrendingUp, ShieldCheck, Clock, Trash2, Eye
+  Settings, LogOut, Bell, Star, Menu, X,
+  Compass, Users, TrendingUp, ShieldCheck, Clock, Trash2, Eye, Sparkles
 } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
-
-const T = {
-  bg: '#F1F5F9',
-  accent: '#2563EB',
-  accentGradient: 'linear-gradient(135deg, #2563EB 0%, #1D4ED8 100%)',
-  sidebarBg: '#0F172A',
-  text: '#0F172A',
-  muted: '#64748B',
-  white: '#ffffff',
-  radiusLg: '24px',
-};
 
 const Dashboard = () => {
   const navigate = useNavigate();
@@ -27,6 +16,10 @@ const Dashboard = () => {
   const [tripStats, setTripStats] = useState({ total: 0, completed: 0, ongoing: 0, planning: 0 });
   const [hoveredTripId, setHoveredTripId] = useState(null);
   
+  // Custom Dynamic Dropdown Toggle State for Main Navigation
+  const [isNavOpen, setIsNavOpen] = useState(false);
+  const navRef = useRef(null);
+
   const [bookingData, setBookingData] = useState({ 
     origin: '',
     destination: '', 
@@ -35,10 +28,19 @@ const Dashboard = () => {
     budget: ''
   });
 
-  // State for weather and distance data
   const [tripWeatherDistance, setTripWeatherDistance] = useState({});
 
-  // Function to fetch weather and distance for a specific trip
+  // Close Navigation menu on outside click context
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      if (navRef.current && !navRef.current.contains(event.target)) {
+        setIsNavOpen(false);
+      }
+    };
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, []);
+
   const fetchWeatherAndDistance = useCallback(async (tripId, token, apiUrl) => {
     try {
       const weatherRes = await axios.get(`${apiUrl}/api/trips/${tripId}/weather`, {
@@ -58,7 +60,6 @@ const Dashboard = () => {
       }));
     } catch (error) {
       console.error(`[Weather/Distance] Error for trip ${tripId}:`, error);
-      // Set fallback values on error
       setTripWeatherDistance(prev => ({
         ...prev,
         [tripId]: {
@@ -85,7 +86,6 @@ const Dashboard = () => {
           setTripStats(response.data.stats);
         }
         
-        // Fetch weather and distance for each trip
         response.data.data.forEach(trip => {
           fetchWeatherAndDistance(trip._id, token, apiUrl);
         });
@@ -107,9 +107,7 @@ const Dashboard = () => {
     if (savedUser?.username) setUserName(savedUser.username);
     fetchMyTrips();
 
-    // Auto-refresh weather/distance every 5 minutes (300000ms)
     const weatherRefreshInterval = setInterval(() => {
-      console.log('[Dashboard] Auto-refreshing weather/distance...');
       fetchMyTrips();
     }, 300000);
 
@@ -125,7 +123,6 @@ const Dashboard = () => {
     navigate('/login');
   };
 
-  // Helper function to get weather emoji
   const getWeatherEmoji = (weatherCode) => {
     if (!weatherCode) return '🌤️';
     if (weatherCode <= 1) return '☀️';
@@ -194,211 +191,294 @@ const Dashboard = () => {
   };
 
   const stats = [
-    { label: 'Total Trips', value: tripStats.total.toString().padStart(2, '0'), icon: Plane, color: '#3B82F6' },
-    { label: 'Completed', value: tripStats.completed.toString().padStart(2, '0'), icon: ShieldCheck, color: '#10B981' },
-    { label: 'Planning', value: tripStats.planning.toString().padStart(2, '0'), icon: Calendar, color: '#F59E0B' },
+    { label: 'Total Expeditions', value: tripStats.total.toString().padStart(2, '0'), icon: Plane, bgStyle: 'bg-indigo-50 text-indigo-600 border-indigo-100' },
+    { label: 'Journeys Completed', value: tripStats.completed.toString().padStart(2, '0'), icon: ShieldCheck, bgStyle: 'bg-emerald-50 text-emerald-600 border-emerald-100' },
+    { label: 'In Active Planning', value: tripStats.planning.toString().padStart(2, '0'), icon: Calendar, bgStyle: 'bg-amber-50 text-amber-600 border-amber-200' },
   ];
 
   return (
-    <div style={{ minHeight: '100vh', background: T.bg, display: 'flex', fontFamily: "'Plus Jakarta Sans', sans-serif" }}>
+    <div className="min-h-screen bg-[#F8FAFC] font-['Plus_Jakarta_Sans',sans-serif] antialiased text-slate-900 relative">
       
-      <aside style={{ width: '280px', background: T.sidebarBg, color: '#fff', display: 'flex', flexDirection: 'column', padding: '40px 24px', position: 'fixed', height: '100vh', zIndex: 10 }}>
-        <div style={{ display: 'flex', alignItems: 'center', gap: 15, marginBottom: '50px' }}>
-          <div style={{ background: T.accentGradient, padding: 10, borderRadius: '14px' }}>
-            <Plane size={22} color="#fff" style={{ transform: 'rotate(45deg)' }} />
-          </div>
-          <h2 style={{ fontSize: '20px', fontWeight: 800, letterSpacing: '1.5px' }}>TRAVELOOP</h2>
-        </div>
+      {/* ── TOP UTILITY NAVIGATION HEADER (FULL WIDTH EXPERIENCE) ── */}
+      <header className="w-full h-24 bg-white border-b border-slate-200/80 sticky top-0 z-40 px-6 lg:px-12 flex items-center justify-between shadow-sm shadow-slate-100/50">
         
-        <nav style={{ flex: 1, display: 'flex', flexDirection: 'column', gap: '10px' }}>
-          {[
-            { id: 'dashboard', icon: LayoutDashboard, label: 'Control Center' },
-            { id: 'trips', icon: Compass, label: 'My Expeditions' },
-            { id: 'trending', icon: TrendingUp, label: 'Marketplace' },
-            { id: 'settings', icon: Settings, label: 'Preferences' }
-          ].map((item) => (
-            <div key={item.id} onClick={() => {
-              if (item.id === 'trending') {
-                navigate('/marketplace');
-              } else if (item.id === 'settings') {
-                navigate('/preferences');
-              } else {
-                setActiveTab(item.id);
-              }
-            }} style={{ display: 'flex', alignItems: 'center', gap: 15, padding: '16px 20px', borderRadius: '18px', cursor: 'pointer', background: activeTab === item.id ? 'rgba(255,255,255,0.08)' : 'transparent', color: activeTab === item.id ? '#60A5FA' : '#94A3B8', transition: '0.3s' }}>
-              <item.icon size={20} />
-              <span style={{ fontWeight: 600, fontSize: '15px' }}>{item.label}</span>
+        {/* Left Segment: Logo and Dynamic Action Dropdown Menu Trigger */}
+        <div className="flex items-center gap-6 relative" ref={navRef}>
+          <div className="flex items-center gap-3">
+            <div className="bg-slate-950 p-2.5 rounded-xl text-white shadow-md">
+              <Plane className="w-5 h-5 rotate-45" />
             </div>
-          ))}
-        </nav>
-
-        <button onClick={handleLogout} style={{ display: 'flex', alignItems: 'center', gap: 15, padding: '16px 20px', background: 'rgba(239, 68, 68, 0.1)', border: '1px solid rgba(239, 68, 68, 0.2)', borderRadius: '18px', color: '#EF4444', cursor: 'pointer', fontWeight: 700 }}>
-          <LogOut size={20} /> Logout
-        </button>
-      </aside>
-
-      <main style={{ marginLeft: '280px', flex: 1, padding: '40px 50px' }}>
-        <header style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '40px' }}>
-          <div>
-            <h1 style={{ fontSize: '32px', fontWeight: 800, color: T.text }}>Hello, {userName} ✨</h1>
-            <p style={{ color: T.muted, fontSize: '15px', marginTop: 5 }}>Your next adventure is just one click away.</p>
+            <span className="text-lg font-black tracking-widest text-slate-950 hidden sm:block">TRAVELOOP</span>
           </div>
-          <div style={{ display: 'flex', gap: '20px', alignItems: 'center' }}>
-            <div style={{ background: '#fff', padding: '12px', borderRadius: '18px', border: '1px solid #E2E8F0', cursor: 'pointer' }}>
-              <Bell size={22} color={T.muted} />
+
+          <div className="h-6 w-px bg-slate-200 hidden sm:block" />
+
+          {/* DYNAMIC ACTION NAVIGATION MENU BUTTON */}
+          <button
+            type="button"
+            onClick={() => setIsNavOpen(!isNavOpen)}
+            className={`flex items-center gap-2.5 px-4 py-2.5 rounded-xl text-sm font-bold border transition-all duration-200 shadow-2xs ${
+              isNavOpen 
+                ? 'bg-slate-950 text-white border-slate-950 ring-4 ring-slate-900/5' 
+                : 'bg-white text-slate-800 border-slate-200 hover:border-slate-400'
+            }`}
+          >
+            {isNavOpen ? <X className="w-4 h-4 text-indigo-400" /> : <Menu className="w-4 h-4 text-indigo-600" />}
+            <span>Main Navigation</span>
+          </button>
+
+          {/* FLOATING DROPDOWN LIST CONTAINER */}
+          {isNavOpen && (
+            <div className="absolute top-14 left-0 sm:left-44 w-64 bg-white border border-slate-200 rounded-2xl shadow-xl p-3 space-y-1 z-50 animate-in fade-in slide-in-from-top-2 duration-150">
+              <span className="text-[10px] font-extrabold text-slate-400 uppercase tracking-widest block px-3 py-1.5">Hub Navigation</span>
+              {[
+                { id: 'dashboard', icon: LayoutDashboard, label: 'Control Center' },
+                { id: 'trips', icon: Compass, label: 'My Expeditions' },
+                { id: 'trending', icon: TrendingUp, label: 'Marketplace' },
+                { id: 'settings', icon: Settings, label: 'Preferences' }
+              ].map((item) => {
+                const isActive = activeTab === item.id;
+                return (
+                  <button 
+                    key={item.id} 
+                    type="button"
+                    onClick={() => {
+                      setIsNavOpen(false);
+                      if (item.id === 'trending') navigate('/marketplace');
+                      else if (item.id === 'settings') navigate('/preferences');
+                      else setActiveTab(item.id);
+                    }} 
+                    className={`w-full flex items-center gap-3 px-3 py-3 rounded-xl text-xs sm:text-sm font-bold tracking-wide transition-colors ${
+                      isActive 
+                        ? 'bg-slate-950 text-white' 
+                        : 'text-slate-500 hover:text-slate-900 hover:bg-slate-50'
+                    }`}
+                  >
+                    <item.icon className={`w-4 h-4 shrink-0 ${isActive ? 'text-indigo-400' : 'text-slate-400'}`} />
+                    <span>{item.label}</span>
+                  </button>
+                );
+              })}
+              
+              <div className="h-px bg-slate-100 my-2" />
+              <button 
+                onClick={handleLogout} 
+                className="w-full flex items-center gap-3 px-3 py-3 text-red-600 hover:bg-red-50 rounded-xl text-xs sm:text-sm font-bold transition-colors"
+              >
+                <LogOut className="w-4 h-4 shrink-0" />
+                <span>Log Out Account</span>
+              </button>
             </div>
-            <div style={{ width: 52, height: 52, borderRadius: '18px', background: T.accentGradient, display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#fff', fontWeight: 800, fontSize: '20px' }}>
+          )}
+        </div>
+
+        {/* Right Segment: Notifications and Profile Interface */}
+        <div className="flex items-center gap-4">
+          <button className="p-3 bg-white hover:bg-slate-50 text-slate-500 hover:text-slate-900 rounded-xl border border-slate-200 shadow-2xs relative transition-all">
+            <Bell className="w-5 h-5" />
+            <span className="absolute top-3 right-3 w-1.5 h-1.5 bg-indigo-600 rounded-full ring-2 ring-white" />
+          </button>
+          <div className="flex items-center gap-3 bg-white pr-4 sm:pr-5 pl-2.5 py-1.5 rounded-xl border border-slate-200 shadow-2xs">
+            <div className="w-8 h-8 rounded-lg bg-slate-950 flex items-center justify-center text-white font-black text-sm shadow-sm">
               {userName.charAt(0).toUpperCase()}
             </div>
+            <span className="text-sm font-bold text-slate-800 tracking-wide hidden sm:block">{userName}</span>
           </div>
-        </header>
+        </div>
+      </header>
 
-        {/* ── 3. UPDATED FORM GRID WITH BUDGET INPUT ── */}
-        <section style={{ background: T.white, padding: '40px', borderRadius: '32px', boxShadow: '0 20px 40px rgba(0,0,0,0.03)', marginBottom: '40px' }}>
-          <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginBottom: '30px' }}>
-            <div style={{ width: 4, height: 24, background: T.accent, borderRadius: 2 }}></div>
-            <h3 style={{ fontSize: '20px', fontWeight: 800, color: T.text }}>Create New Itinerary</h3>
+      {/* ── MAIN WORKSPACE SURFACE (INFINITE SCREEN HORIZON SPACE) ── */}
+      <main className="w-full px-6 lg:px-12 py-10 mx-auto max-w-7xl">
+        
+        {/* HERO WELCOME GREETING */}
+        <div className="mb-10">
+          <h1 className="text-3xl lg:text-4xl font-black text-slate-950 tracking-tight">
+            Welcome, <span className="text-indigo-600">{userName}</span> ✨
+          </h1>
+          <p className="text-slate-500 text-sm md:text-base mt-1 font-semibold">Orchestrate your next custom routes and operational manifests seamlessly.</p>
+        </div>
+
+        {/* HIGH-VISIBILITY COMPACT FORM ENTRY STRIP */}
+        <section className="bg-white p-6 rounded-2xl border border-slate-200 shadow-xs mb-10">
+          <div className="flex items-center gap-2.5 mb-5 px-1">
+            <Sparkles className="w-4 h-4 text-indigo-600" />
+            <h3 className="text-xs sm:text-sm font-black text-slate-900 uppercase tracking-widest">Deploy New Expedition Manifest</h3>
           </div>
-          <form onSubmit={handleBooking} style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr 1fr 1fr 0.8fr', gap: '20px' }}>
-            <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
-              <label style={{ fontSize: '12px', fontWeight: 800, color: T.muted }}>FROM</label>
-              <div style={{ display: 'flex', alignItems: 'center', gap: 12, background: '#F8FAFC', padding: '16px 20px', borderRadius: '20px', border: '1px solid #E2E8F0' }}>
-                <MapPin size={18} color={T.accent} />
-                <input required name="origin" type="text" value={bookingData.origin} onChange={handleInputChange} placeholder="Starting point?" style={{ background: 'none', border: 'none', outline: 'none', fontSize: '14px', fontWeight: 600, width: '100%' }} />
+          
+          <form onSubmit={handleBooking} className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-6 gap-4 items-end">
+            <div className="space-y-1.5 px-0.5">
+              <span className="text-xs font-black tracking-wider text-slate-500 uppercase block">Leaving From</span>
+              <div className="flex items-center gap-3 bg-slate-50 border border-slate-200 focus-within:bg-white focus-within:border-slate-400 rounded-xl px-4 py-3 transition-all">
+                <MapPin className="w-5 h-5 text-indigo-600 shrink-0" />
+                <input required name="origin" type="text" value={bookingData.origin} onChange={handleInputChange} placeholder="Origin city" className="bg-transparent border-none outline-none text-sm font-bold w-full text-slate-900 placeholder-slate-400" />
               </div>
             </div>
-            <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
-              <label style={{ fontSize: '12px', fontWeight: 800, color: T.muted }}>TO</label>
-              <div style={{ display: 'flex', alignItems: 'center', gap: 12, background: '#F8FAFC', padding: '16px 20px', borderRadius: '20px', border: '1px solid #E2E8F0' }}>
-                <MapPin size={18} color={T.accent} />
-                <input required name="destination" type="text" value={bookingData.destination} onChange={handleInputChange} placeholder="Where to?" style={{ background: 'none', border: 'none', outline: 'none', fontSize: '14px', fontWeight: 600, width: '100%' }} />
+
+            <div className="space-y-1.5 px-0.5">
+              <span className="text-xs font-black tracking-wider text-slate-500 uppercase block">Going To</span>
+              <div className="flex items-center gap-3 bg-slate-50 border border-slate-200 focus-within:bg-white focus-within:border-slate-400 rounded-xl px-4 py-3 transition-all">
+                <MapPin className="w-5 h-5 text-indigo-600 shrink-0" />
+                <input required name="destination" type="text" value={bookingData.destination} onChange={handleInputChange} placeholder="Where to?" className="bg-transparent border-none outline-none text-sm font-bold w-full text-slate-900 placeholder-slate-400" />
               </div>
             </div>
-            <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
-              <label style={{ fontSize: '12px', fontWeight: 800, color: T.muted }}>DATE</label>
-              <div style={{ display: 'flex', alignItems: 'center', gap: 12, background: '#F8FAFC', padding: '16px 20px', borderRadius: '20px', border: '1px solid #E2E8F0' }}>
-                <Calendar size={18} color={T.accent} />
-                <input required name="startDate" type="date" value={bookingData.startDate} onChange={handleInputChange} style={{ background: 'none', border: 'none', outline: 'none', fontSize: '14px', fontWeight: 600, width: '100%' }} />
+
+            <div className="space-y-1.5 px-0.5">
+              <span className="text-xs font-black tracking-wider text-slate-500 uppercase block">Departure Date</span>
+              <div className="flex items-center gap-3 bg-slate-50 border border-slate-200 focus-within:bg-white focus-within:border-slate-400 rounded-xl px-4 py-3 transition-all">
+                <Calendar className="w-5 h-5 text-indigo-600 shrink-0" />
+                <input required name="startDate" type="date" value={bookingData.startDate} onChange={handleInputChange} className="bg-transparent border-none outline-none text-sm font-bold w-full text-slate-700 cursor-pointer" />
               </div>
             </div>
-            <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
-              <label style={{ fontSize: '12px', fontWeight: 800, color: T.muted }}>TRAVELERS</label>
-              <div style={{ display: 'flex', alignItems: 'center', gap: 12, background: '#F8FAFC', padding: '16px 20px', borderRadius: '20px', border: '1px solid #E2E8F0' }}>
-                <Users size={18} color={T.accent} />
-                <select name="travelers" value={bookingData.travelers} onChange={handleInputChange} style={{ background: 'none', border: 'none', outline: 'none', fontSize: '14px', fontWeight: 600, width: '100%', cursor: 'pointer' }}>
+
+            <div className="space-y-1.5 px-0.5">
+              <span className="text-xs font-black tracking-wider text-slate-500 uppercase block">Travelers Matrix</span>
+              <div className="flex items-center gap-3 bg-slate-50 border border-slate-200 focus-within:bg-white focus-within:border-slate-400 rounded-xl px-4 py-3 transition-all">
+                <Users className="w-5 h-5 text-indigo-600 shrink-0" />
+                <select name="travelers" value={bookingData.travelers} onChange={handleInputChange} className="bg-transparent border-none outline-none text-sm font-bold w-full text-slate-700 cursor-pointer appearance-none">
                   <option>1 Person</option><option>2 Persons</option><option>4 Persons</option><option>Group (5+)</option>
                 </select>
               </div>
             </div>
-            <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
-              <label style={{ fontSize: '12px', fontWeight: 800, color: T.muted }}>BUDGET (₹)</label>
-              <div style={{ display: 'flex', alignItems: 'center', gap: 12, background: '#F8FAFC', padding: '16px 20px', borderRadius: '20px', border: '1px solid #E2E8F0' }}>
-                <span style={{ fontWeight: 800, color: T.accent }}>₹</span>
-                <input required name="budget" type="number" value={bookingData.budget} onChange={handleInputChange} placeholder="Budget" style={{ background: 'none', border: 'none', outline: 'none', fontSize: '14px', fontWeight: 600, width: '100%' }} />
+
+            <div className="space-y-1.5 px-0.5">
+              <span className="text-xs font-black tracking-wider text-slate-500 uppercase block">Budget (₹)</span>
+              <div className="flex items-center gap-2 bg-slate-50 border border-slate-200 focus-within:bg-white focus-within:border-slate-400 rounded-xl px-4 py-3 transition-all">
+                <span className="font-extrabold text-indigo-600 text-sm shrink-0">₹</span>
+                <input required name="budget" type="number" value={bookingData.budget} onChange={handleInputChange} placeholder="Max amount" className="bg-transparent border-none outline-none text-sm font-bold w-full text-slate-900 placeholder-slate-400" />
               </div>
             </div>
-            <div style={{ display: 'flex', alignItems: 'end' }}>
-              <button type="submit" disabled={isLoading} style={{ width: '100%', padding: '18px', background: T.accentGradient, color: '#fff', border: 'none', borderRadius: '20px', fontWeight: 800, cursor: 'pointer' }}>
-                {isLoading ? '...' : 'BOOK'}
-              </button>
-            </div>
+
+            <button type="submit" disabled={isLoading} className="w-full py-3.5 bg-slate-950 hover:bg-indigo-600 text-white font-black text-sm uppercase tracking-widest rounded-xl shadow-md transition-all duration-150">
+              {isLoading ? 'Sending...' : 'Deploy Route'}
+            </button>
           </form>
         </section>
 
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '25px', marginBottom: '40px' }}>
+        {/* METRICS DISPATCH MODULE CARD INDEX */}
+        <section className="grid grid-cols-1 sm:grid-cols-3 gap-6 mb-10">
           {stats.map((stat, i) => (
-            <div key={i} style={{ background: T.white, padding: '30px', borderRadius: '28px', display: 'flex', alignItems: 'center', gap: 20 }}>
-              <div style={{ background: `${stat.color}10`, padding: '15px', borderRadius: '20px' }}>
-                <stat.icon size={26} color={stat.color} />
+            <div key={i} className="bg-white p-5 lg:p-6 rounded-2xl border border-slate-200 shadow-2xs flex items-center justify-between hover:shadow-sm transition-all duration-150">
+              <div className="space-y-1">
+                <p className="text-xs font-black text-slate-400 uppercase tracking-widest">{stat.label}</p>
+                <h4 className="text-3xl font-black text-slate-900 font-mono tracking-tight">{stat.value}</h4>
               </div>
-              <div>
-                <p style={{ fontSize: '13px', fontWeight: 700, color: T.muted }}>{stat.label}</p>
-                <h4 style={{ fontSize: '26px', fontWeight: 800, color: T.text }}>{stat.value}</h4>
+              <div className={`p-4 rounded-xl border ${stat.bgStyle} shadow-2xs`}>
+                <stat.icon className="w-5 h-5 stroke-[2px]" />
               </div>
             </div>
           ))}
-        </div>
+        </section>
 
-        <div style={{ marginBottom: '50px' }}>
-          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '25px' }}>
-            <h3 style={{ fontSize: '22px', fontWeight: 800, color: T.text }}>My Planned Expeditions 🗺️</h3>
-            <button onClick={fetchMyTrips} style={{ background: 'none', border: 'none', color: T.accent, fontWeight: 700, cursor: 'pointer', display: 'flex', alignItems: 'center', gap: 5 }}>
-              <Clock size={16} /> Refresh
+        {/* DYNAMIC ACTIVE EXPEDITIONS RECOGNITION LIST */}
+        <section className="mb-12">
+          <div className="flex justify-between items-center mb-6">
+            <h3 className="text-xs sm:text-sm font-black uppercase tracking-widest text-slate-400">Your Active Expeditions</h3>
+            <button onClick={fetchMyTrips} className="flex items-center gap-2 text-xs font-black text-indigo-600 hover:text-slate-950 transition-colors bg-white border border-slate-200 shadow-2xs px-4 py-2 rounded-xl">
+              <Clock className="w-4 h-4" /> Sync Registry
             </button>
           </div>
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(350px, 1fr))', gap: '25px' }}>
+          
+          <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
             {myTrips.length > 0 ? myTrips.map((trip, idx) => (
-              <div key={idx} onClick={() => navigate(`/trip/${trip._id}`)} onMouseEnter={() => setHoveredTripId(trip._id)} onMouseLeave={() => setHoveredTripId(null)} style={{ background: T.white, borderRadius: '28px', padding: '25px', border: '1px solid #f1f5f9', boxShadow: hoveredTripId === trip._id ? '0 20px 40px rgba(0,0,0,0.08)' : '0 10px 30px rgba(0,0,0,0.02)', transition: 'all 0.3s', cursor: 'pointer' }}>
-                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'start', marginBottom: '15px' }}>
-                  <div>
-                    <h4 style={{ fontWeight: 800, fontSize: '17px', margin: 0, marginBottom: '5px' }}>{trip.tripName}</h4>
-                    <span style={{ display: 'inline-block', background: trip.status === 'completed' ? '#dcfce7' : trip.status === 'ongoing' ? '#dbeafe' : '#fef3c7', color: trip.status === 'completed' ? '#15803d' : trip.status === 'ongoing' ? '#0c4a6e' : '#92400e', padding: '3px 8px', borderRadius: '6px', fontSize: '11px', fontWeight: '700', textTransform: 'capitalize' }}>{trip.status || 'planning'}</span>
-                  </div>
-                  <div style={{ background: '#F0F9FF', padding: '6px 12px', borderRadius: '10px', fontSize: '13px', fontWeight: 800, color: T.accent }}>₹{trip.totalBudget}</div>
-                </div>
-                
-                {/* Weather and Distance Info */}
-                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px', marginBottom: '15px', padding: '12px', background: '#F8FAFC', borderRadius: '16px' }}>
-                  {/* Weather Card */}
-                  <div style={{ textAlign: 'center' }}>
-                    <div style={{ fontSize: '24px', marginBottom: '4px' }}>
-                      {getWeatherEmoji(tripWeatherDistance[trip._id]?.weather?.condition)}
+              <article 
+                key={trip._id || idx}
+                onClick={() => navigate(`/trip/${trip._id}`)} 
+                onMouseEnter={() => setHoveredTripId(trip._id)} 
+                onMouseLeave={() => setHoveredTripId(null)} 
+                className={`group bg-white rounded-2xl p-6 border transition-all duration-150 flex flex-col justify-between cursor-pointer relative shadow-2xs ${
+                  hoveredTripId === trip._id ? 'border-slate-400 shadow-sm' : 'border-slate-200'
+                }`}
+              >
+                <div>
+                  <div className="flex justify-between items-start gap-4 mb-4">
+                    <div className="space-y-1.5">
+                      <h4 className="font-extrabold text-lg text-slate-900 tracking-tight group-hover:text-indigo-600 transition-colors line-clamp-1">{trip.tripName}</h4>
+                      <span className={`inline-flex px-2.5 py-0.5 rounded text-[10px] font-extrabold uppercase tracking-widest border ${
+                        trip.status === 'completed' ? 'bg-emerald-50 text-emerald-700 border-emerald-200' : 
+                        trip.status === 'ongoing' ? 'bg-blue-50 text-blue-700 border-blue-200' : 
+                        'bg-rose-50 text-rose-700 border-rose-200'
+                      }`}>
+                        {trip.status || 'planning'}
+                      </span>
                     </div>
-                    <div style={{ fontSize: '13px', fontWeight: 800, color: T.text }}>
-                      {tripWeatherDistance[trip._id]?.weather?.temp || 25}°C
+                    <div className="text-sm md:text-base font-black text-slate-900 font-mono bg-slate-50 px-3 py-1.5 rounded-xl border border-slate-200/60">
+                      ₹{trip.totalBudget.toLocaleString('en-IN')}
                     </div>
-                    <div style={{ fontSize: '10px', color: T.muted }}>Weather</div>
                   </div>
                   
-                  {/* Distance Card */}
-                  <div style={{ textAlign: 'center' }}>
-                    <div style={{ fontSize: '24px', marginBottom: '4px' }}>🗺️</div>
-                    <div style={{ fontSize: '13px', fontWeight: 800, color: T.text }}>
-                      {tripWeatherDistance[trip._id]?.distance || 0} km
+                  {/* Weather Telemetry Matrix Readouts */}
+                  <div className="grid grid-cols-2 gap-3 p-3 bg-slate-50 rounded-xl mb-4 text-center border border-slate-100">
+                    <div className="p-2 bg-white rounded-xl border border-slate-200/60 shadow-2xs">
+                      <span className="text-2xl block">{getWeatherEmoji(tripWeatherDistance[trip._id]?.weather?.condition)}</span>
+                      <span className="text-sm font-black text-slate-900 font-mono block mt-1">{tripWeatherDistance[trip._id]?.weather?.temp || 25}°C</span>
                     </div>
-                    <div style={{ fontSize: '10px', color: T.muted }}>Distance</div>
+                    <div className="p-2 bg-white rounded-xl border border-slate-200/60 shadow-2xs">
+                      <span className="text-xl block mt-0.5">🗺️</span>
+                      <span className="text-sm font-black text-slate-900 font-mono block mt-1.5">{(tripWeatherDistance[trip._id]?.distance || 0).toLocaleString()} km</span>
+                    </div>
+                  </div>
+                  
+                  <div className="space-y-1.5 mb-5 text-xs font-bold text-slate-500">
+                    <p className="flex items-center gap-2 text-slate-700"><Calendar className="w-3.5 h-3.5 text-slate-400" /> {new Date(trip.startDate).toLocaleDateString(undefined, { dateStyle: 'medium' })}</p>
+                    <p className="line-clamp-2 leading-relaxed text-slate-400 font-medium italic">"{trip.description || 'No overview configured.'}"</p>
                   </div>
                 </div>
-                
-                <p style={{ fontSize: '12px', color: T.muted, marginBottom: '8px' }}>📅 {new Date(trip.startDate).toLocaleDateString()}</p>
-                <p style={{ fontSize: '12px', color: T.muted, marginBottom: '15px', display: '-webkit-box', WebkitLineClamp: '2', WebkitBoxOrient: 'vertical', overflow: 'hidden' }}>{trip.description || 'No description added'}</p>
-                <div style={{ display: 'flex', gap: '8px', borderTop: '1px solid #f1f5f9', paddingTop: '15px' }}>
-                  <button onClick={() => navigate(`/trip/${trip._id}`)} style={{ flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '6px', padding: '10px', background: T.accent, color: '#fff', border: 'none', borderRadius: '10px', cursor: 'pointer', fontWeight: '600', fontSize: '12px' }}>
-                    <Eye size={14} /> Details
+
+                <div className="flex gap-2.5 pt-4 border-t border-slate-100">
+                  <button 
+                    type="button"
+                    onClick={(e) => { e.stopPropagation(); navigate(`/trip/${trip._id}`); }} 
+                    className="flex-1 flex items-center justify-center gap-2 py-2.5 bg-slate-950 text-white hover:bg-indigo-600 rounded-xl text-xs md:text-sm font-black uppercase tracking-wider transition-colors duration-150"
+                  >
+                    <Eye className="w-4 h-4" /> Open Card
                   </button>
-                  <button onClick={(e) => handleDeleteTrip(trip._id, e)} style={{ padding: '10px 12px', background: '#fee2e2', border: '1px solid #fecaca', color: '#dc2626', borderRadius: '10px', cursor: 'pointer', fontWeight: '600', fontSize: '12px', display: 'flex', alignItems: 'center', gap: '4px' }}>
-                    <Trash2 size={14} />
+                  <button 
+                    type="button"
+                    onClick={(e) => handleDeleteTrip(trip._id, e)} 
+                    className="p-3 bg-red-50 hover:bg-red-100 text-red-600 border border-red-200 rounded-xl transition-colors"
+                  >
+                    <Trash2 className="w-4 h-4" />
                   </button>
                 </div>
-              </div>
+              </article>
             )) : (
-              <div style={{ gridColumn: '1/-1', textAlign: 'center', padding: '40px', background: '#fff', borderRadius: '32px', border: '2px dashed #E2E8F0', color: T.muted }}>
-                No trips scheduled. Start your journey above! ✈️
+              <div className="col-span-full text-center py-16 bg-white rounded-2xl border-2 border-dashed border-slate-200 px-6 text-slate-400 text-sm font-medium tracking-wide">
+                No active trip entries found inside this project manifest space.
               </div>
             )}
           </div>
-        </div>
+        </section>
 
-        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '25px' }}>
-          <h3 style={{ fontSize: '22px', fontWeight: 800, color: T.text }}>Trending Destinations</h3>
-          <button style={{ color: T.accent, background: 'none', border: 'none', fontWeight: 700, fontSize: '14px' }}>See All</button>
-        </div>
-        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '30px' }}>
-          {[
-            { name: 'Swiss Alps Premium', price: '₹84k', img: 'https://images.unsplash.com/photo-1531310197839-ccf54634509e?q=80&w=600', time: '7 Days' },
-            { name: 'Kyoto Zen Valley', price: '₹62k', img: 'https://images.unsplash.com/photo-1493976040374-85c8e12f0c0e?q=80&w=600', time: '5 Days' }
-          ].map((place, idx) => (
-            <div key={idx} style={{ background: T.white, borderRadius: '32px', overflow: 'hidden', border: '1px solid #f1f5f9' }}>
-              <img src={place.img} style={{ width: '100%', height: '200px', objectFit: 'cover' }} alt={place.name} />
-              <div style={{ padding: '25px' }}>
-                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                  <h4 style={{ fontWeight: 800, fontSize: '18px' }}>{place.name}</h4>
-                  <span style={{ fontSize: '18px', fontWeight: 800, color: '#10B981' }}>{place.price}</span>
+        {/* CURATED EXTERNAL DECK HIGHLIGHT INDEX */}
+        <section className="pb-10">
+          <div className="flex justify-between items-center mb-6">
+            <h3 className="text-sm font-black uppercase tracking-widest text-slate-400">Curated Escape Profiles</h3>
+            <button type="button" onClick={() => navigate('/marketplace')} className="text-xs font-bold text-indigo-600 hover:text-slate-950 transition-colors">See Complete Index</button>
+          </div>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            {[
+              { name: 'Swiss Alps Premium Luxury Pack', price: '₹84,000', img: 'https://images.unsplash.com/photo-1531310197839-ccf54634509e?q=80&w=600', time: '7 Days' },
+              { name: 'Kyoto Zen Hidden Shrines Tour', price: '₹62,000', img: 'https://images.unsplash.com/photo-1493976040374-85c8e12f0c0e?q=80&w=600', time: '5 Days' }
+            ].map((place, idx) => (
+              <div key={idx} className="group bg-white rounded-2xl overflow-hidden border border-slate-200/60 shadow-2xl flex flex-col sm:flex-row transition-all duration-150 hover:shadow-md">
+                <div className="sm:w-44 h-44 sm:h-auto overflow-hidden bg-slate-50 shrink-0 relative">
+                  <img src={place.img} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500 ease-out" alt={place.name} />
+                  <span className="absolute bottom-3 left-3 px-2.5 py-1 bg-white/95 backdrop-blur-md text-[10px] font-black tracking-widest text-slate-900 rounded-md shadow-sm uppercase">{place.time}</span>
+                </div>
+                <div className="p-6 flex-1 flex flex-col justify-between">
+                  <div className="space-y-1.5">
+                    <h4 className="font-extrabold text-base md:text-lg text-slate-900 group-hover:text-indigo-600 transition-colors line-clamp-1">{place.name}</h4>
+                    <p className="text-xs md:text-sm text-slate-400 font-semibold">All-inclusive localized premium route setup.</p>
+                  </div>
+                  <div className="flex items-center justify-between gap-4 pt-4 border-t border-slate-100 mt-5 sm:mt-0">
+                    <span className="text-lg font-black text-emerald-600 font-mono">{place.price}</span>
+                    <button type="button" onClick={() => navigate('/marketplace')} className="text-xs font-black uppercase tracking-widest text-indigo-600 hover:text-slate-950 transition-colors">Explore</button>
+                  </div>
                 </div>
               </div>
-            </div>
-          ))}
-        </div>
+            ))}
+          </div>
+        </section>
       </main>
     </div>
   );
