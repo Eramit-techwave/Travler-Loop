@@ -60,7 +60,7 @@ const tripSchema = new mongoose.Schema({
     }],
     weather: {
         temp: Number,
-        condition: String,
+        condition: Number,
         humidity: Number,
         windSpeed: Number,
         lastUpdated: Date

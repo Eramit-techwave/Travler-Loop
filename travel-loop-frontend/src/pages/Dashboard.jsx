@@ -217,7 +217,15 @@ const Dashboard = () => {
             { id: 'trending', icon: TrendingUp, label: 'Marketplace' },
             { id: 'settings', icon: Settings, label: 'Preferences' }
           ].map((item) => (
-            <div key={item.id} onClick={() => setActiveTab(item.id)} style={{ display: 'flex', alignItems: 'center', gap: 15, padding: '16px 20px', borderRadius: '18px', cursor: 'pointer', background: activeTab === item.id ? 'rgba(255,255,255,0.08)' : 'transparent', color: activeTab === item.id ? '#60A5FA' : '#94A3B8', transition: '0.3s' }}>
+            <div key={item.id} onClick={() => {
+              if (item.id === 'trending') {
+                navigate('/marketplace');
+              } else if (item.id === 'settings') {
+                navigate('/preferences');
+              } else {
+                setActiveTab(item.id);
+              }
+            }} style={{ display: 'flex', alignItems: 'center', gap: 15, padding: '16px 20px', borderRadius: '18px', cursor: 'pointer', background: activeTab === item.id ? 'rgba(255,255,255,0.08)' : 'transparent', color: activeTab === item.id ? '#60A5FA' : '#94A3B8', transition: '0.3s' }}>
               <item.icon size={20} />
               <span style={{ fontWeight: 600, fontSize: '15px' }}>{item.label}</span>
             </div>
