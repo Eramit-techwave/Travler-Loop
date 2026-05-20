@@ -147,8 +147,10 @@ const Dashboard = () => {
       const tripPayload = {
         tripName: bookingData.destination,
         origin: bookingData.origin,
+        destination: bookingData.destination,
         startDate: bookingData.startDate,
         endDate: bookingData.startDate,
+        travelers: bookingData.travelers === '1 Person' ? 1 : bookingData.travelers === '2 Persons' ? 2 : bookingData.travelers === '4 Persons' ? 4 : 5,
         description: `Trip for ${bookingData.travelers}`,
         stops: [],
         totalBudget: Number(bookingData.budget) || 0
