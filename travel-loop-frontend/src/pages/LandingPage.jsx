@@ -51,14 +51,14 @@ const DESTINATIONS = [
   { id: 6, city: 'Kashmir', region: 'Jammu & Kashmir', scope: 'India', type: 'Mountains', price: '₹12,500', rating: 5.0, tag: 'Rare Paradise', img: 'https://images.unsplash.com/photo-1543731068-7e0f5beff43a?w=600&auto=format&fit=crop&q=70', tagline: 'The ultimate canvas of heaven on earth', intro: 'An ethereal valley surrounded by snow-capped peaks, glassy lakes, and pine forests.', why: 'Luxury houseboat stays and high-altitude alpine meadows.', attractions: 'Dal Lake, Gulmarg Gondola, Shalimar Bagh', time: 'Mar – Oct', food: 'Rogan Josh, Yakhni, Kehwa', fact: 'India\'s only floating vegetable market operates on Dal Lake.' },
   { id: 7, city: 'Leh Ladakh', region: 'Kashmir Border', scope: 'India', type: 'Hidden Gems', price: '₹18,999', rating: 4.9, tag: 'Adventure Pro', img: 'https://images.unsplash.com/photo-1605649487212-47bdab064df7?w=600&auto=format&fit=crop&q=70', tagline: 'The high-altitude desert of mystics', intro: 'Rugged cold desert passes and Tibetan Buddhist monasteries.', why: 'Top destination for motorcycle expeditions and deep stargazing.', attractions: 'Pangong Lake, Khardung La, Thiksey Monastery', time: 'Jun – Sep', food: 'Thukpa, Momos, Butter Tea', fact: 'Magnetic Hill appears to pull vehicles upward.' },
   { id: 8, city: 'Kerala Backwaters', region: 'South India', scope: 'India', type: 'Nature', price: '₹8,999', rating: 4.7, tag: 'Serene Nature', img: 'https://images.unsplash.com/photo-1593693397690-362cb9666fc2?w=600&auto=format&fit=crop&q=70', tagline: 'Emerald standard of tropical serenity', intro: 'Labyrinthine brackish lagoons, lakes, and peaceful canals.', why: 'Bespoke Kettuvallam luxury houseboat cruises.', attractions: 'Vembanad Lake, Kumarakom Bird Sanctuary', time: 'Sep – Mar', food: 'Karimeen Pollichathu, Malabar Parotta', fact: 'Home of the legendary Nehru Trophy Snake Boat Race.' },
-  { id: 9, city: 'Hampi', region: 'Karnataka', scope: 'India', type: 'Historical', price: '₹6,499', rating: 4.8, tag: 'UNESCO Site', img: 'https://images.unsplash.com/photo-1600100397608-f01017df39fb?w=600&auto=format&fit=crop&q=70', tagline: 'An architectural stone canvas of empires', intro: 'Open-air museum with monolithic temples and boulder mountains.', why: 'Ancient throne city of the wealthy Vijayanagara Empire.', attractions: 'Virupaksha Temple, Stone Chariot, Lotus Mahal', time: 'Oct – Feb', food: 'Bisi Bele Bath, Akki Roti', fact: 'Carvings emit distinct musical notes when tapped.' },
+  { id: 9, city: 'Hampi', region: 'Karnataka', scope: 'India', type: 'Historical', price: '₹6,499', rating: 4.8, tag: 'UNESCO Site', img: 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQrRhiLDdMOnMqaMpJ5YwPG2TRla3GjV_c-2A&s', tagline: 'An architectural stone canvas of empires', intro: 'Open-air museum with monolithic temples and boulder mountains.', why: 'Ancient throne city of the wealthy Vijayanagara Empire.', attractions: 'Virupaksha Temple, Stone Chariot, Lotus Mahal', time: 'Oct – Feb', food: 'Bisi Bele Bath, Akki Roti', fact: 'Carvings emit distinct musical notes when tapped.' },
   { id: 10, city: 'Andaman Islands', region: 'Bay of Bengal', scope: 'India', type: 'Beaches', price: '₹22,500', rating: 4.9, tag: 'Exotic Ocean', img: 'https://images.unsplash.com/photo-1589556264800-08ae9e129a8c?w=600&auto=format&fit=crop&q=70', tagline: 'Turquoise waters and colonial secrets', intro: 'Tropical islands boasting coral reefs and biome-rich rainforests.', why: 'Premier deep-sea scuba diving and historical monuments.', attractions: 'Radhanagar Beach, Cellular Jail, Havelock', time: 'Oct – May', food: 'Seafood Platters, Coconut Prawn Curry', fact: 'Barren Island has South Asia\'s only active volcano.' },
   { id: 11, city: 'Bali', region: 'Indonesia', scope: 'International', type: 'Luxury', price: '₹45,000', rating: 4.7, tag: 'Luxury Tier', img: 'https://images.unsplash.com/photo-1537996194471-e657df975ab4?w=600&auto=format&fit=crop&q=70', tagline: 'The tropical playground of the gods', intro: 'Island paradise defined by volcanic ranges, rice paddies, and pristine beaches.', why: 'Major global hub for luxury eco-resorts and wellness retreats.', attractions: 'Ubud Monkey Forest, Uluwatu, Tanah Lot', time: 'Apr – Oct', food: 'Nasi Goreng, Sate Lilit, Babi Guling', fact: 'Nyepi day of silence shuts even the international airport.' },
   { id: 12, city: 'Paris', region: 'France', scope: 'International', type: 'Historical', price: '₹85,000', rating: 5.0, tag: 'Romantic Epic', img: 'https://images.unsplash.com/photo-1502602898657-3e91760cbb34?w=600&auto=format&fit=crop&q=70', tagline: 'The permanent capital of art and high fashion', intro: 'Global epicenter for art, haute couture, gastronomy, and architectural history.', why: 'World\'s most iconic destination for romantic cityscapes.', attractions: 'Eiffel Tower, Louvre Museum, Notre-Dame', time: 'Apr – Jun, Sep – Oct', food: 'Croissants, Escargot, Macarons', fact: 'Only one Stop sign exists in the entire city of Paris.' },
   { id: 13, city: 'Santorini', region: 'Greece', scope: 'International', type: 'Beaches', price: '₹1,10,000', rating: 4.9, tag: 'Luxury Tier', img: 'https://images.unsplash.com/photo-1570077188670-e3a8d69ac5ff?w=600&auto=format&fit=crop&q=70', tagline: 'Vivid azure domes over volcanic calderas', intro: 'Cyclades island reshaped by a devastating ancient volcanic eruption.', why: 'Whitewashed villas and breathtaking sunset views over the sea.', attractions: 'Oia Sunsets, Akrotiri Site, Red Beach', time: 'May – Oct', food: 'Tomato Gefthedes, Grilled Octopus', fact: 'The entire island is technically still an active volcanic caldera.' },
   { id: 14, city: 'Maldives', region: 'Indian Ocean', scope: 'International', type: 'Luxury', price: '₹95,000', rating: 4.8, tag: 'Honeymoon Choice', img: 'https://images.unsplash.com/photo-1514282401047-d79a71a590e8?w=600&auto=format&fit=crop&q=70', tagline: 'Private water villas on hyper-clear lagoons', intro: 'Tropical nation composed of 26 ring-shaped atolls in the Indian Ocean.', why: 'Gold standard for luxury overwater bungalows and private islands.', attractions: 'Male City, Vaadhoo Bioluminescence, Reefs', time: 'Nov – Apr', food: 'Garudhiya, Mas Huni, Reef Fish', fact: 'Flattest country on Earth, averaging 1.5 m above sea level.' },
   { id: 15, city: 'Switzerland Alps', region: 'Europe', scope: 'International', type: 'Mountains', price: '₹1,40,000', rating: 5.0, tag: 'Premium', img: 'https://images.unsplash.com/photo-1531310197839-ccf54634509e?w=600&auto=format&fit=crop&q=70', tagline: 'The pinnacle of global pristine beauty', intro: 'Mountainous Central European nation home to lakes, alpine villages, and peaks.', why: 'Legendary ski resorts, hiking trails, and precision train journeys.', attractions: 'Matterhorn, Interlaken, Jungfraujoch', time: 'Jun – Aug, Dec – Mar', food: 'Cheese Fondue, Swiss Chocolate, Rösti', fact: 'Swiss law requires guinea pigs to be kept in pairs.' },
-  { id: 16, city: 'Tokyo', region: 'Japan', scope: 'International', type: 'Historical', price: '₹1,20,000', rating: 4.9, tag: 'Cultural Icon', img: 'https://images.unsplash.com/photo-1540959375944-7049f642e9f1?w=600&auto=format&fit=crop&q=70', tagline: 'Where ancient temples meet neon skylines', intro: 'World\'s largest city blending millennia of tradition with hyper-modern innovation.', why: 'Sushi culture, temples, cherry blossoms, Mt Fuji day trips.', attractions: 'Shibuya Crossing, Senso-ji, Shinjuku, Mt Fuji', time: 'Mar – May, Oct – Nov', food: 'Sushi, Ramen, Tempura, Yakitori', fact: 'Tokyo has more Michelin-starred restaurants than any other city.' },
+  { id: 16, city: 'Tokyo', region: 'Japan', scope: 'International', type: 'Historical', price: '₹1,20,000', rating: 4.9, tag: 'Cultural Icon', img: 'https://images.unsplash.com/photo-1540959375944-7049f642e9f1?w=600&auto=format&fithttps://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRQK2p8VfiUFvGwzz3yXW472igtn4hY5oL69w&shttps://dynamic-media-cdn.tripadvisor.com/media/photo-o/32/b7/0d/16/caption.jpg?w=300&h=300&s=1=crop&q=70', tagline: 'Where ancient temples meet neon skylines', intro: 'World\'s largest city blending millennia of tradition with hyper-modern innovation.', why: 'Sushi culture, temples, cherry blossoms, Mt Fuji day trips.', attractions: 'Shibuya Crossing, Senso-ji, Shinjuku, Mt Fuji', time: 'Mar – May, Oct – Nov', food: 'Sushi, Ramen, Tempura, Yakitori', fact: 'Tokyo has more Michelin-starred restaurants than any other city.' },
 ];
 
 const OFFERS = [
@@ -421,65 +421,191 @@ const LandingPage = () => {
       </section>
 
       {/* ══════════ MEMORIES MOSAIC ══════════ */}
-      <section style={{ padding: `40px ${PX}`, background: '#f8fafc', borderTop: '1px solid #f1f5f9', borderBottom: '1px solid #f1f5f9' }}>
-        <div style={{ maxWidth: MAX, margin: '0 auto' }}>
-          <SectionHead eyebrow="Social Grid Logs" title="Emotional Chronicles" sub="Real captures from expeditions orchestrated across our member groups." center />
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4,1fr)', gridAutoRows: 190, gap: 12 }}>
-            {MEMORY_IMGS.map((m, i) => (
-              <div key={i} style={{ gridRow: m.span === 'row-span-2' ? 'span 2' : 'span 1', gridColumn: m.span === 'col-span-2' ? 'span 2' : 'span 1', borderRadius: 18, overflow: 'hidden', position: 'relative' }}
-                onMouseEnter={e => { e.currentTarget.querySelector('.mem-overlay').style.opacity = 1; }}
-                onMouseLeave={e => { e.currentTarget.querySelector('.mem-overlay').style.opacity = 0; }}>
-                <img src={m.img} alt={m.title} loading="lazy" style={{ width: '100%', height: '100%', objectFit: 'cover', transition: 'transform .6s' }}
-                  onMouseEnter={e => e.currentTarget.style.transform = 'scale(1.05)'}
-                  onMouseLeave={e => e.currentTarget.style.transform = 'scale(1)'} />
-                <div className="mem-overlay" style={{ position: 'absolute', inset: 0, background: 'linear-gradient(to top, rgba(0,0,0,0.7) 0%, transparent 50%)', opacity: 0, transition: 'opacity .3s', display: 'flex', alignItems: 'flex-end', padding: '16px 14px' }}>
-                  <span style={{ fontSize: 12, fontWeight: 700, color: '#fff' }}>{m.title}</span>
-                </div>
-              </div>
-            ))}
-          </div>
-        </div>
-      </section>
+     {/* ══════════ SOCIAL GRID LOGS (EMOTIONAL CHRONICLES) ══════════ */}
+<section id="memories" className="py-24 px-6 md:px-16 bg-slate-50 border-y border-slate-200/60">
+  <div className="max-w-7xl mx-auto">
+    
+    {/* Section Title Unit */}
+    <div className="text-center max-w-2xl mx-auto mb-16 space-y-2">
+      <span className="text-xs font-black uppercase tracking-[3px] text-blue-600">Social Grid Logs</span>
+      <h2 className="text-3xl md:text-5xl font-black text-slate-900 uppercase tracking-tight">Emotional Chronicles</h2>
+      <p className="text-slate-400 text-sm font-medium">Real snapshot captures from premium expeditions across our global member networks.</p>
+    </div>
 
+    {/* Perfectly Organized, Symmetric Card Grid (No weird offsets or uneven gaps) */}
+    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">
+      {[
+        { 
+          title: 'Alpine Ridges Trek', 
+          location: 'Switzerland Alps',
+          img: 'https://images.unsplash.com/photo-1464822759023-fed622ff2c3b?w=800&auto=format&fit=crop&q=80' 
+        },
+        { 
+          title: 'Tropical Ocean Lagoons', 
+          location: 'Maldives Islands',
+          img: 'https://images.unsplash.com/photo-1506929562872-bb421503ef21?w=800&auto=format&fit=crop&q=80' 
+        },
+        { 
+          title: 'Desert Trail Expeditions', 
+          location: 'Cairo Outskirts',
+          img: 'https://images.unsplash.com/photo-1539650116574-8efeb43e2750?w=800&auto=format&fit=crop&q=80' 
+        },
+        { 
+          title: 'Ancient Temple Paths', 
+          location: 'Kyoto, Japan',
+          img: 'https://images.unsplash.com/photo-1493976040374-85c8e12f0c0e?w=800&auto=format&fit=crop&q=80' 
+        },
+        { 
+          title: 'Coastal Horizon Hikes', 
+          location: 'Santorini Cliffs',
+          img: 'https://images.unsplash.com/photo-1570077188670-e3a8d69ac5ff?w=800&auto=format&fit=crop&q=80' 
+        },
+        { 
+          title: 'Sacred High Shrines', 
+          location: 'Kedarnath Valley',
+          img: 'https://images.unsplash.com/photo-1561361531-99e224e9f331?w=800&auto=format&fit=crop&q=80' 
+        },
+        { 
+          title: 'Mughal Imperial Architecture', 
+          location: 'Agra, India',
+          img: 'https://images.unsplash.com/photo-1564507592333-c60657eea523?w=800&auto=format&fit=crop&q=80' 
+        },
+        { 
+          title: 'Bespoke Friend Retreats', 
+          location: 'Bali Villa Greens',
+          img: 'https://images.unsplash.com/photo-1537996194471-e657df975ab4?w=800&auto=format&fit=crop&q=80' 
+        }
+      ].map((m, i) => (
+        <div 
+          key={i} 
+          className="bg-white border border-slate-200/80 rounded-[32px] overflow-hidden shadow-xs hover:shadow-xl hover:-translate-y-1.5 transition-all duration-500 group flex flex-col h-[340px]"
+        >
+          {/* Symmetric Image Frame Container */}
+          <div className="h-[230px] overflow-hidden relative bg-slate-100 shadow-3xs">
+            <img 
+              src={m.img} 
+              alt={m.title} 
+              loading="lazy" 
+              className="w-full h-full object-cover transition-transform duration-[800ms] group-hover:scale-105" 
+            />
+            {/* Clean Location Tag on Top-Left */}
+            <span className="absolute top-4 left-4 px-3 py-1 bg-white/95 backdrop-blur-md rounded-xl text-[9px] font-black tracking-widest text-slate-800 uppercase border border-slate-100 shadow-2xs">
+              {m.location}
+            </span>
+          </div>
+
+          {/* Structured Text Content Panel (Keeps the alignment uniform across rows) */}
+          <div className="p-5 flex-1 flex flex-col justify-center text-left bg-white">
+            <p className="text-[9px] font-black uppercase tracking-[3px] text-blue-600">Expedition Instance</p>
+            <h3 className="text-base font-black text-slate-900 tracking-tight leading-snug mt-1 group-hover:text-blue-600 transition-colors line-clamp-1">
+              {m.title}
+            </h3>
+            <div className="mt-2.5 flex items-center justify-between text-[11px] font-bold text-slate-400 border-t border-slate-100 pt-2.5">
+              <span>Verified Log</span>
+              <span className="text-blue-600/80 uppercase tracking-widest text-[9px]">View Assets →</span>
+            </div>
+          </div>
+
+        </div>
+      ))}
+    </div>
+
+  </div>
+</section>
       {/* ══════════ STAYS ══════════ */}
-      <section id="stays" style={{ padding: `40px ${PX}`, maxWidth: MAX, margin: '0 auto' }}>
-        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end', marginBottom: 24, flexWrap: 'wrap', gap: 12 }}>
-          <SectionHead eyebrow="Premium Resides" title="Bespoke Eco-Resorts" sub="High-tier stays with private lounge amenities." />
-          <button onClick={() => alert('View all stays')} style={{ padding: '8px 18px', border: '1px solid #e2e8f0', borderRadius: 100, background: '#fff', fontSize: 11, fontWeight: 700, color: '#475569', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: 5, whiteSpace: 'nowrap' }}>
-            View All <ArrowRight size={13} />
+      <section id="stays" className="py-20 px-6 md:px-16 max-w-7xl mx-auto w-full">
+
+        {/* Header Setup with Flex Control */}
+        <div className="flex flex-col sm:flex-row justify-between items-start sm:items-end mb-10 gap-6 text-left">
+          <SectionHead
+            eyebrow="Premium Resides"
+            title="Bespoke Eco-Resorts"
+            sub="High-tier stays with private lounge amenities."
+          />
+          <button
+            onClick={() => alert('Viewing all luxury arrays')}
+            className="group px-6 py-3 border border-slate-200 hover:border-slate-300 rounded-full bg-white text-xs font-black uppercase tracking-widest text-slate-600 hover:text-slate-900 transition-all cursor-pointer shadow-2xs flex items-center gap-2 whitespace-nowrap active:scale-95"
+          >
+            View All <ArrowRight size={14} className="group-hover:translate-x-1 transition-transform" />
           </button>
         </div>
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3,1fr)', gap: 16 }}>
-          {STAYS.map((s, i) => (
-            <div key={i} style={{ background: '#fff', border: '1px solid #e2e8f0', borderRadius: 20, overflow: 'hidden', boxShadow: '0 2px 8px rgba(0,0,0,0.05)', transition: 'all .25s' }}
-              onMouseEnter={e => { e.currentTarget.style.transform = 'translateY(-3px)'; e.currentTarget.style.boxShadow = '0 12px 28px rgba(0,0,0,0.1)'; }}
-              onMouseLeave={e => { e.currentTarget.style.transform = 'none'; e.currentTarget.style.boxShadow = '0 2px 8px rgba(0,0,0,0.05)'; }}>
-              <div style={{ height: 180, overflow: 'hidden', position: 'relative' }}>
-                <img src={s.img} alt={s.name} loading="lazy" style={{ width: '100%', height: '100%', objectFit: 'cover', transition: 'transform .5s' }}
-                  onMouseEnter={e => e.currentTarget.style.transform = 'scale(1.05)'}
-                  onMouseLeave={e => e.currentTarget.style.transform = 'none'} />
-                <div style={{ position: 'absolute', bottom: 10, left: 10, display: 'flex', alignItems: 'center', gap: 4, background: 'rgba(255,255,255,0.92)', padding: '3px 8px', borderRadius: 7 }}>
-                  <Hotel size={10} color="#2563eb" />
-                  <span style={{ fontSize: 9, fontWeight: 800, color: '#0f172a', textTransform: 'uppercase', letterSpacing: '0.1em' }}>{s.amenity}</span>
+
+        {/* Responsive Balanced Grid System (Bigger & Structured Cards) */}
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+          {[
+            {
+              name: 'Amanpuri Pavilions Oasis',
+              location: 'Phuket, Thailand',
+              price: '₹1,20,000/Night',
+              rating: '4.9',
+              amenity: 'Private Beach Access',
+              img: 'https://images.unsplash.com/photo-1566073771259-6a8506099945?w=800&auto=format&fit=crop&q=80'
+            },
+            {
+              name: 'The Taj Mahal Palace Imperial',
+              location: 'Mumbai, India',
+              price: '₹45,000/Night',
+              rating: '5.0',
+              amenity: 'Sea-Facing Royal Suite',
+              img: 'https://images.unsplash.com/photo-1540555700478-4be289fbecef?w=800&auto=format&fit=crop&q=80'
+            },
+            {
+              name: 'Amangiri Canyon Retreat',
+              location: 'Utah, USA',
+              price: '₹2,10,000/Night',
+              rating: '4.9',
+              amenity: 'Desert Horizon View',
+              img: 'https://images.unsplash.com/photo-1582719508461-905c673771fd?w=800&auto=format&fit=crop&q=80'
+            }
+          ].map((s, i) => (
+            <div
+              key={i}
+              className="bg-white border border-slate-200/80 rounded-[32px] overflow-hidden shadow-xs hover:shadow-xl hover:-translate-y-2 transition-all duration-500 flex flex-col justify-between h-full group"
+            >
+              {/* Expanded Image Framing Ecosystem (Height Adjusted to 220px) */}
+              <div className="h-[220px] overflow-hidden relative bg-slate-100 shadow-3xs">
+                <img
+                  src={s.img}
+                  alt={s.name}
+                  loading="lazy"
+                  className="w-full h-full object-cover transition-transform duration-1000 group-hover:scale-105 filter brightness-[0.97]"
+                />
+                {/* Glassmorphism Amenity Tag */}
+                <div className="absolute bottom-4 left-4 flex items-center gap-1.5 bg-white/95 backdrop-blur-md px-3.5 py-1.5 rounded-xl shadow-xs border border-slate-100/60">
+                  <Hotel size={11} className="text-blue-600" />
+                  <span className="text-[9px] font-black text-slate-800 uppercase tracking-widest">{s.amenity}</span>
                 </div>
               </div>
-              <div style={{ padding: '14px 16px' }}>
-                <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 5 }}>
-                  <span style={{ fontSize: 10, color: '#94a3b8', fontWeight: 600 }}>{s.location}</span>
-                  <div style={{ display: 'flex', alignItems: 'center', gap: 3 }}>
-                    <Star size={11} fill="#f59e0b" color="#f59e0b" />
-                    <span style={{ fontSize: 11, fontWeight: 800, color: '#0f172a' }}>{s.rating}</span>
+
+              {/* Card Data Content Text Area */}
+              <div className="p-6 flex-1 flex flex-col justify-between space-y-4 text-left">
+                <div className="space-y-1.5">
+                  <div className="flex justify-between items-center text-xs">
+                    <span className="text-slate-400 font-extrabold uppercase tracking-wider">{s.location}</span>
+                    <div className="flex items-center gap-0.5 font-bold text-amber-500 text-[11px] bg-amber-50 px-2 py-0.5 rounded-lg border border-amber-200/40">
+                      <Star size={11} fill="currentColor" /> <span>{s.rating}</span>
+                    </div>
                   </div>
+                  <h3 className="text-xl font-black text-slate-900 tracking-tight leading-snug group-hover:text-blue-600 transition-colors">
+                    {s.name}
+                  </h3>
                 </div>
-                <h3 style={{ fontSize: 15, fontWeight: 800, color: '#0f172a', margin: '0 0 10px', letterSpacing: '-0.01em' }}>{s.name}</h3>
-                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', paddingTop: 10, borderTop: '1px solid #f1f5f9' }}>
+
+                {/* Pricing Config & Action Button */}
+                <div className="pt-4 border-t border-slate-100 flex items-center justify-between">
                   <div>
-                    <p style={{ fontSize: 9, color: '#94a3b8', fontWeight: 700, textTransform: 'uppercase', margin: 0, letterSpacing: '0.1em' }}>Rate</p>
-                    <p style={{ fontSize: 14, fontWeight: 900, color: '#0f172a', margin: '2px 0 0', fontFamily: 'monospace' }}>{s.price}</p>
+                    <p className="text-[9px] text-slate-400 uppercase font-black tracking-wider">Rate Value</p>
+                    <p className="text-lg font-mono font-black text-slate-900 mt-0.5">{s.price}</p>
                   </div>
-                  <button onClick={() => alert(`Booking ${s.name}`)} style={{ padding: '7px 14px', background: '#f8fafc', border: '1px solid #e2e8f0', borderRadius: 8, fontSize: 10, fontWeight: 700, color: '#475569', cursor: 'pointer', textTransform: 'uppercase', letterSpacing: '0.06em' }}>Book Now</button>
+                  <button
+                    onClick={() => alert(`Launching lodging secure matrix for ${s.name}`)}
+                    className="px-5 py-2.5 bg-slate-50 hover:bg-blue-600 border border-slate-200 text-slate-700 hover:text-white rounded-xl text-xs font-black uppercase tracking-wider transition-all cursor-pointer shadow-3xs active:scale-95"
+                  >
+                    Book Now
+                  </button>
                 </div>
               </div>
+
             </div>
           ))}
         </div>
