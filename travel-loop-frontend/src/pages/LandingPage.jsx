@@ -43,57 +43,57 @@ const STYLE = `
 
 /* ─── DATA ─── */
 const DESTINATIONS = [
-  { id:1,  city:'Manali',           region:'Himachal Pradesh', scope:'India',         type:'Mountains',   price:'₹5,999',   rating:4.8, tag:'Best Seller',     img:'https://images.unsplash.com/photo-1486915309851-b0cc1f8a0084?w=600&auto=format&fit=crop&q=70', tagline:'Alpine paradise amidst whispering pines',         intro:'A high-altitude Himalayan resort town known as a backpacking and honeymoon hub.',             why:'Famous for Solang Valley adventure sports and Rohtang Pass snow views.',   attractions:'Hadimba Temple, Solang Valley, Jogini Waterfalls', time:'Oct – Feb', food:'Siddu, Khatta, Trout Fish Curry',   fact:'Named after sage Manu; means "home of Manu".' },
-  { id:2,  city:'Goa',              region:'Coastal India',    scope:'India',         type:'Beaches',     price:'₹3,499',   rating:4.9, tag:'Trending',        img:'https://images.unsplash.com/photo-1512343879784-a960bf40e7f2?w=600&auto=format&fit=crop&q=70', tagline:'Sunkissed shores and Portuguese legacy',          intro:'A blend of Indian and Portuguese cultures with endless pristine shorelines.',              why:'Global beach festivals, nightlife, and baroque architecture.',             attractions:'Baga Beach, Basilica of Bom Jesus, Dudhsagar', time:'Nov – Feb', food:'Fish Curry Rice, Bebinca, Vindaloo', fact:'Goa hosts Asia\'s largest floating casinos.' },
-  { id:3,  city:'Kedarnath',        region:'Uttarakhand',      scope:'India',         type:'Devotional',  price:'₹14,999',  rating:5.0, tag:'Sacred Elite',    img:'https://images.unsplash.com/photo-1561361531-99e224e9f331?w=600&auto=format&fit=crop&q=70', tagline:'Cosmic energy lines meet eternal snows',          intro:'Ancient stone shrine of Lord Shiva at 11,755 ft in the Garhwal Himalayas.',              why:'One of the twelve sacred Jyotirlingas.',                                  attractions:'Kedarnath Temple, Bhairav Temple, Chorabari Lake', time:'May – Oct', food:'Aloo ke Gutke, Phaanu',             fact:'Survived 2013 floods due to a boulder protecting its rear.' },
-  { id:4,  city:'Varanasi',         region:'Uttar Pradesh',    scope:'India',         type:'Devotional',  price:'₹4,999',   rating:4.9, tag:'Spiritual Core',  img:'https://images.unsplash.com/photo-1561361058-c24cecae35ca?w=600&auto=format&fit=crop&q=70', tagline:'Where time begins and eternity rests',            intro:'The spiritual heart of India where Vedic river rituals run uninterrupted.',              why:'Oldest continuously inhabited city on the planet.',                       attractions:'Kashi Vishwanath, Dashashwamedh Ghat, Sarnath',  time:'Oct – Mar', food:'Kachori Sabzi, Banarasi Paan',      fact:'Mark Twain called it older than history and legend.' },
-  { id:5,  city:'Jaipur',           region:'Rajasthan',        scope:'India',         type:'Historical',  price:'₹4,500',   rating:4.8, tag:'Royal Heritage',  img:'https://images.unsplash.com/photo-1477587458883-471a5ed94245?w=600&auto=format&fit=crop&q=70', tagline:'The symphonic pink city of royalty',              intro:'Capital of Rajasthan famed for symmetrical design and terracotta pink streets.',          why:'Complex fortress layouts and astronomical structures.',                   attractions:'Amber Palace, Hawa Mahal, Jantar Mantar',        time:'Nov – Mar', food:'Dal Baati Churma, Laal Maas',       fact:'Painted pink in 1876 to welcome Prince Albert of Wales.' },
-  { id:6,  city:'Kashmir',          region:'Jammu & Kashmir',  scope:'India',         type:'Mountains',   price:'₹12,500',  rating:5.0, tag:'Rare Paradise',   img:'https://images.unsplash.com/photo-1543731068-7e0f5beff43a?w=600&auto=format&fit=crop&q=70', tagline:'The ultimate canvas of heaven on earth',          intro:'An ethereal valley surrounded by snow-capped peaks, glassy lakes, and pine forests.',     why:'Luxury houseboat stays and high-altitude alpine meadows.',                attractions:'Dal Lake, Gulmarg Gondola, Shalimar Bagh',       time:'Mar – Oct', food:'Rogan Josh, Yakhni, Kehwa',         fact:'India\'s only floating vegetable market operates on Dal Lake.' },
-  { id:7,  city:'Leh Ladakh',       region:'Kashmir Border',   scope:'India',         type:'Hidden Gems', price:'₹18,999',  rating:4.9, tag:'Adventure Pro',   img:'https://images.unsplash.com/photo-1605649487212-47bdab064df7?w=600&auto=format&fit=crop&q=70', tagline:'The high-altitude desert of mystics',             intro:'Rugged cold desert passes and Tibetan Buddhist monasteries.',                             why:'Top destination for motorcycle expeditions and deep stargazing.',         attractions:'Pangong Lake, Khardung La, Thiksey Monastery',   time:'Jun – Sep', food:'Thukpa, Momos, Butter Tea',         fact:'Magnetic Hill appears to pull vehicles upward.' },
-  { id:8,  city:'Kerala Backwaters',region:'South India',      scope:'India',         type:'Nature',      price:'₹8,999',   rating:4.7, tag:'Serene Nature',   img:'https://images.unsplash.com/photo-1593693397690-362cb9666fc2?w=600&auto=format&fit=crop&q=70', tagline:'Emerald standard of tropical serenity',           intro:'Labyrinthine brackish lagoons, lakes, and peaceful canals.',                              why:'Bespoke Kettuvallam luxury houseboat cruises.',                           attractions:'Vembanad Lake, Kumarakom Bird Sanctuary',        time:'Sep – Mar', food:'Karimeen Pollichathu, Malabar Parotta', fact:'Home of the legendary Nehru Trophy Snake Boat Race.' },
-  { id:9,  city:'Hampi',            region:'Karnataka',        scope:'India',         type:'Historical',  price:'₹6,499',   rating:4.8, tag:'UNESCO Site',     img:'https://images.unsplash.com/photo-1600100397608-f01017df39fb?w=600&auto=format&fit=crop&q=70', tagline:'An architectural stone canvas of empires',        intro:'Open-air museum with monolithic temples and boulder mountains.',                          why:'Ancient throne city of the wealthy Vijayanagara Empire.',                attractions:'Virupaksha Temple, Stone Chariot, Lotus Mahal',  time:'Oct – Feb', food:'Bisi Bele Bath, Akki Roti',          fact:'Carvings emit distinct musical notes when tapped.' },
-  { id:10, city:'Andaman Islands',  region:'Bay of Bengal',    scope:'India',         type:'Beaches',     price:'₹22,500',  rating:4.9, tag:'Exotic Ocean',    img:'https://images.unsplash.com/photo-1589556264800-08ae9e129a8c?w=600&auto=format&fit=crop&q=70', tagline:'Turquoise waters and colonial secrets',           intro:'Tropical islands boasting coral reefs and biome-rich rainforests.',                       why:'Premier deep-sea scuba diving and historical monuments.',                attractions:'Radhanagar Beach, Cellular Jail, Havelock',      time:'Oct – May', food:'Seafood Platters, Coconut Prawn Curry', fact:'Barren Island has South Asia\'s only active volcano.' },
-  { id:11, city:'Bali',             region:'Indonesia',        scope:'International', type:'Luxury',      price:'₹45,000',  rating:4.7, tag:'Luxury Tier',     img:'https://images.unsplash.com/photo-1537996194471-e657df975ab4?w=600&auto=format&fit=crop&q=70', tagline:'The tropical playground of the gods',             intro:'Island paradise defined by volcanic ranges, rice paddies, and pristine beaches.',         why:'Major global hub for luxury eco-resorts and wellness retreats.',          attractions:'Ubud Monkey Forest, Uluwatu, Tanah Lot',         time:'Apr – Oct', food:'Nasi Goreng, Sate Lilit, Babi Guling', fact:'Nyepi day of silence shuts even the international airport.' },
-  { id:12, city:'Paris',            region:'France',           scope:'International', type:'Historical',  price:'₹85,000',  rating:5.0, tag:'Romantic Epic',   img:'https://images.unsplash.com/photo-1502602898657-3e91760cbb34?w=600&auto=format&fit=crop&q=70', tagline:'The permanent capital of art and high fashion',   intro:'Global epicenter for art, haute couture, gastronomy, and architectural history.',          why:'World\'s most iconic destination for romantic cityscapes.',               attractions:'Eiffel Tower, Louvre Museum, Notre-Dame',        time:'Apr – Jun, Sep – Oct', food:'Croissants, Escargot, Macarons', fact:'Only one Stop sign exists in the entire city of Paris.' },
-  { id:13, city:'Santorini',        region:'Greece',           scope:'International', type:'Beaches',     price:'₹1,10,000',rating:4.9, tag:'Luxury Tier',     img:'https://images.unsplash.com/photo-1570077188670-e3a8d69ac5ff?w=600&auto=format&fit=crop&q=70', tagline:'Vivid azure domes over volcanic calderas',        intro:'Cyclades island reshaped by a devastating ancient volcanic eruption.',                     why:'Whitewashed villas and breathtaking sunset views over the sea.',          attractions:'Oia Sunsets, Akrotiri Site, Red Beach',          time:'May – Oct', food:'Tomato Gefthedes, Grilled Octopus', fact:'The entire island is technically still an active volcanic caldera.' },
-  { id:14, city:'Maldives',         region:'Indian Ocean',     scope:'International', type:'Luxury',      price:'₹95,000',  rating:4.8, tag:'Honeymoon Choice',img:'https://images.unsplash.com/photo-1514282401047-d79a71a590e8?w=600&auto=format&fit=crop&q=70', tagline:'Private water villas on hyper-clear lagoons',     intro:'Tropical nation composed of 26 ring-shaped atolls in the Indian Ocean.',                  why:'Gold standard for luxury overwater bungalows and private islands.',       attractions:'Male City, Vaadhoo Bioluminescence, Reefs',      time:'Nov – Apr', food:'Garudhiya, Mas Huni, Reef Fish',    fact:'Flattest country on Earth, averaging 1.5 m above sea level.' },
-  { id:15, city:'Switzerland Alps',  region:'Europe',          scope:'International', type:'Mountains',   price:'₹1,40,000',rating:5.0, tag:'Premium',         img:'https://images.unsplash.com/photo-1531310197839-ccf54634509e?w=600&auto=format&fit=crop&q=70', tagline:'The pinnacle of global pristine beauty',          intro:'Mountainous Central European nation home to lakes, alpine villages, and peaks.',           why:'Legendary ski resorts, hiking trails, and precision train journeys.',     attractions:'Matterhorn, Interlaken, Jungfraujoch',           time:'Jun – Aug, Dec – Mar', food:'Cheese Fondue, Swiss Chocolate, Rösti', fact:'Swiss law requires guinea pigs to be kept in pairs.' },
-  { id:16, city:'Tokyo',            region:'Japan',            scope:'International', type:'Historical',  price:'₹1,20,000',rating:4.9, tag:'Cultural Icon',   img:'https://images.unsplash.com/photo-1540959375944-7049f642e9f1?w=600&auto=format&fit=crop&q=70', tagline:'Where ancient temples meet neon skylines',        intro:'World\'s largest city blending millennia of tradition with hyper-modern innovation.',      why:'Sushi culture, temples, cherry blossoms, Mt Fuji day trips.',            attractions:'Shibuya Crossing, Senso-ji, Shinjuku, Mt Fuji', time:'Mar – May, Oct – Nov', food:'Sushi, Ramen, Tempura, Yakitori', fact:'Tokyo has more Michelin-starred restaurants than any other city.' },
+  { id: 1, city: 'Manali', region: 'Himachal Pradesh', scope: 'India', type: 'Mountains', price: '₹5,999', rating: 4.8, tag: 'Best Seller', img: 'https://images.unsplash.com/photo-1486915309851-b0cc1f8a0084?w=600&auto=format&fit=crop&q=70', tagline: 'Alpine paradise amidst whispering pines', intro: 'A high-altitude Himalayan resort town known as a backpacking and honeymoon hub.', why: 'Famous for Solang Valley adventure sports and Rohtang Pass snow views.', attractions: 'Hadimba Temple, Solang Valley, Jogini Waterfalls', time: 'Oct – Feb', food: 'Siddu, Khatta, Trout Fish Curry', fact: 'Named after sage Manu; means "home of Manu".' },
+  { id: 2, city: 'Goa', region: 'Coastal India', scope: 'India', type: 'Beaches', price: '₹3,499', rating: 4.9, tag: 'Trending', img: 'https://images.unsplash.com/photo-1512343879784-a960bf40e7f2?w=600&auto=format&fit=crop&q=70', tagline: 'Sunkissed shores and Portuguese legacy', intro: 'A blend of Indian and Portuguese cultures with endless pristine shorelines.', why: 'Global beach festivals, nightlife, and baroque architecture.', attractions: 'Baga Beach, Basilica of Bom Jesus, Dudhsagar', time: 'Nov – Feb', food: 'Fish Curry Rice, Bebinca, Vindaloo', fact: 'Goa hosts Asia\'s largest floating casinos.' },
+  { id: 3, city: 'Kedarnath', region: 'Uttarakhand', scope: 'India', type: 'Devotional', price: '₹14,999', rating: 5.0, tag: 'Sacred Elite', img: 'https://i.pinimg.com/736x/a5/f0/ea/a5f0eac0539b54b2d937bd60073cc21d.jpg', tagline: 'Cosmic energy lines meet eternal snows', intro: 'Ancient stone shrine of Lord Shiva at 11,755 ft in the Garhwal Himalayas.', why: 'One of the twelve sacred Jyotirlingas.', attractions: 'Kedarnath Temple, Bhairav Temple, Chorabari Lake', time: 'May – Oct', food: 'Aloo ke Gutke, Phaanu', fact: 'Survived 2013 floods due to a boulder protecting its rear.' },
+  { id: 4, city: 'Varanasi', region: 'Uttar Pradesh', scope: 'India', type: 'Devotional', price: '₹4,999', rating: 4.9, tag: 'Spiritual Core', img: 'https://images.unsplash.com/photo-1561361058-c24cecae35ca?w=600&auto=format&fit=crop&q=70', tagline: 'Where time begins and eternity rests', intro: 'The spiritual heart of India where Vedic river rituals run uninterrupted.', why: 'Oldest continuously inhabited city on the planet.', attractions: 'Kashi Vishwanath, Dashashwamedh Ghat, Sarnath', time: 'Oct – Mar', food: 'Kachori Sabzi, Banarasi Paan', fact: 'Mark Twain called it older than history and legend.' },
+  { id: 5, city: 'Jaipur', region: 'Rajasthan', scope: 'India', type: 'Historical', price: '₹4,500', rating: 4.8, tag: 'Royal Heritage', img: 'https://chalbanjare.com/crmnew/img_master/package/HawaMahal_17714014690.webp', tagline: 'The symphonic pink city of royalty', intro: 'Capital of Rajasthan famed for symmetrical design and terracotta pink streets.', why: 'Complex fortress layouts and astronomical structures.', attractions: 'Amber Palace, Hawa Mahal, Jantar Mantar', time: 'Nov – Mar', food: 'Dal Baati Churma, Laal Maas', fact: 'Painted pink in 1876 to welcome Prince Albert of Wales.' },
+  { id: 6, city: 'Kashmir', region: 'Jammu & Kashmir', scope: 'India', type: 'Mountains', price: '₹12,500', rating: 5.0, tag: 'Rare Paradise', img: 'https://images.unsplash.com/photo-1543731068-7e0f5beff43a?w=600&auto=format&fit=crop&q=70', tagline: 'The ultimate canvas of heaven on earth', intro: 'An ethereal valley surrounded by snow-capped peaks, glassy lakes, and pine forests.', why: 'Luxury houseboat stays and high-altitude alpine meadows.', attractions: 'Dal Lake, Gulmarg Gondola, Shalimar Bagh', time: 'Mar – Oct', food: 'Rogan Josh, Yakhni, Kehwa', fact: 'India\'s only floating vegetable market operates on Dal Lake.' },
+  { id: 7, city: 'Leh Ladakh', region: 'Kashmir Border', scope: 'India', type: 'Hidden Gems', price: '₹18,999', rating: 4.9, tag: 'Adventure Pro', img: 'https://images.unsplash.com/photo-1605649487212-47bdab064df7?w=600&auto=format&fit=crop&q=70', tagline: 'The high-altitude desert of mystics', intro: 'Rugged cold desert passes and Tibetan Buddhist monasteries.', why: 'Top destination for motorcycle expeditions and deep stargazing.', attractions: 'Pangong Lake, Khardung La, Thiksey Monastery', time: 'Jun – Sep', food: 'Thukpa, Momos, Butter Tea', fact: 'Magnetic Hill appears to pull vehicles upward.' },
+  { id: 8, city: 'Kerala Backwaters', region: 'South India', scope: 'India', type: 'Nature', price: '₹8,999', rating: 4.7, tag: 'Serene Nature', img: 'https://images.unsplash.com/photo-1593693397690-362cb9666fc2?w=600&auto=format&fit=crop&q=70', tagline: 'Emerald standard of tropical serenity', intro: 'Labyrinthine brackish lagoons, lakes, and peaceful canals.', why: 'Bespoke Kettuvallam luxury houseboat cruises.', attractions: 'Vembanad Lake, Kumarakom Bird Sanctuary', time: 'Sep – Mar', food: 'Karimeen Pollichathu, Malabar Parotta', fact: 'Home of the legendary Nehru Trophy Snake Boat Race.' },
+  { id: 9, city: 'Hampi', region: 'Karnataka', scope: 'India', type: 'Historical', price: '₹6,499', rating: 4.8, tag: 'UNESCO Site', img: 'https://images.unsplash.com/photo-1600100397608-f01017df39fb?w=600&auto=format&fit=crop&q=70', tagline: 'An architectural stone canvas of empires', intro: 'Open-air museum with monolithic temples and boulder mountains.', why: 'Ancient throne city of the wealthy Vijayanagara Empire.', attractions: 'Virupaksha Temple, Stone Chariot, Lotus Mahal', time: 'Oct – Feb', food: 'Bisi Bele Bath, Akki Roti', fact: 'Carvings emit distinct musical notes when tapped.' },
+  { id: 10, city: 'Andaman Islands', region: 'Bay of Bengal', scope: 'India', type: 'Beaches', price: '₹22,500', rating: 4.9, tag: 'Exotic Ocean', img: 'https://images.unsplash.com/photo-1589556264800-08ae9e129a8c?w=600&auto=format&fit=crop&q=70', tagline: 'Turquoise waters and colonial secrets', intro: 'Tropical islands boasting coral reefs and biome-rich rainforests.', why: 'Premier deep-sea scuba diving and historical monuments.', attractions: 'Radhanagar Beach, Cellular Jail, Havelock', time: 'Oct – May', food: 'Seafood Platters, Coconut Prawn Curry', fact: 'Barren Island has South Asia\'s only active volcano.' },
+  { id: 11, city: 'Bali', region: 'Indonesia', scope: 'International', type: 'Luxury', price: '₹45,000', rating: 4.7, tag: 'Luxury Tier', img: 'https://images.unsplash.com/photo-1537996194471-e657df975ab4?w=600&auto=format&fit=crop&q=70', tagline: 'The tropical playground of the gods', intro: 'Island paradise defined by volcanic ranges, rice paddies, and pristine beaches.', why: 'Major global hub for luxury eco-resorts and wellness retreats.', attractions: 'Ubud Monkey Forest, Uluwatu, Tanah Lot', time: 'Apr – Oct', food: 'Nasi Goreng, Sate Lilit, Babi Guling', fact: 'Nyepi day of silence shuts even the international airport.' },
+  { id: 12, city: 'Paris', region: 'France', scope: 'International', type: 'Historical', price: '₹85,000', rating: 5.0, tag: 'Romantic Epic', img: 'https://images.unsplash.com/photo-1502602898657-3e91760cbb34?w=600&auto=format&fit=crop&q=70', tagline: 'The permanent capital of art and high fashion', intro: 'Global epicenter for art, haute couture, gastronomy, and architectural history.', why: 'World\'s most iconic destination for romantic cityscapes.', attractions: 'Eiffel Tower, Louvre Museum, Notre-Dame', time: 'Apr – Jun, Sep – Oct', food: 'Croissants, Escargot, Macarons', fact: 'Only one Stop sign exists in the entire city of Paris.' },
+  { id: 13, city: 'Santorini', region: 'Greece', scope: 'International', type: 'Beaches', price: '₹1,10,000', rating: 4.9, tag: 'Luxury Tier', img: 'https://images.unsplash.com/photo-1570077188670-e3a8d69ac5ff?w=600&auto=format&fit=crop&q=70', tagline: 'Vivid azure domes over volcanic calderas', intro: 'Cyclades island reshaped by a devastating ancient volcanic eruption.', why: 'Whitewashed villas and breathtaking sunset views over the sea.', attractions: 'Oia Sunsets, Akrotiri Site, Red Beach', time: 'May – Oct', food: 'Tomato Gefthedes, Grilled Octopus', fact: 'The entire island is technically still an active volcanic caldera.' },
+  { id: 14, city: 'Maldives', region: 'Indian Ocean', scope: 'International', type: 'Luxury', price: '₹95,000', rating: 4.8, tag: 'Honeymoon Choice', img: 'https://images.unsplash.com/photo-1514282401047-d79a71a590e8?w=600&auto=format&fit=crop&q=70', tagline: 'Private water villas on hyper-clear lagoons', intro: 'Tropical nation composed of 26 ring-shaped atolls in the Indian Ocean.', why: 'Gold standard for luxury overwater bungalows and private islands.', attractions: 'Male City, Vaadhoo Bioluminescence, Reefs', time: 'Nov – Apr', food: 'Garudhiya, Mas Huni, Reef Fish', fact: 'Flattest country on Earth, averaging 1.5 m above sea level.' },
+  { id: 15, city: 'Switzerland Alps', region: 'Europe', scope: 'International', type: 'Mountains', price: '₹1,40,000', rating: 5.0, tag: 'Premium', img: 'https://images.unsplash.com/photo-1531310197839-ccf54634509e?w=600&auto=format&fit=crop&q=70', tagline: 'The pinnacle of global pristine beauty', intro: 'Mountainous Central European nation home to lakes, alpine villages, and peaks.', why: 'Legendary ski resorts, hiking trails, and precision train journeys.', attractions: 'Matterhorn, Interlaken, Jungfraujoch', time: 'Jun – Aug, Dec – Mar', food: 'Cheese Fondue, Swiss Chocolate, Rösti', fact: 'Swiss law requires guinea pigs to be kept in pairs.' },
+  { id: 16, city: 'Tokyo', region: 'Japan', scope: 'International', type: 'Historical', price: '₹1,20,000', rating: 4.9, tag: 'Cultural Icon', img: 'https://images.unsplash.com/photo-1540959375944-7049f642e9f1?w=600&auto=format&fit=crop&q=70', tagline: 'Where ancient temples meet neon skylines', intro: 'World\'s largest city blending millennia of tradition with hyper-modern innovation.', why: 'Sushi culture, temples, cherry blossoms, Mt Fuji day trips.', attractions: 'Shibuya Crossing, Senso-ji, Shinjuku, Mt Fuji', time: 'Mar – May, Oct – Nov', food: 'Sushi, Ramen, Tempura, Yakitori', fact: 'Tokyo has more Michelin-starred restaurants than any other city.' },
 ];
 
 const OFFERS = [
-  { title:'Early Bird Monsoon',    discount:'20% OFF ALL ROUTES',  code:'RAIN20',   bg:'#f0fdf4', border:'#bbf7d0', txt:'#14532d', dtxt:'#166534', desc:'Valid on domestic mountain treks and valley routes.' },
-  { title:'First International',  discount:'Flat ₹5,000 OFF',     code:'FLYHIGH',  bg:'#eff6ff', border:'#bfdbfe', txt:'#1e3a8a', dtxt:'#1d4ed8', desc:'Applicable on all premier cross-border itineraries.' },
-  { title:'Sacred Bharat Trail',  discount:'15% Off Shrines',     code:'DEVOTION', bg:'#fffbeb', border:'#fde68a', txt:'#78350f', dtxt:'#b45309', desc:'Priority pass across high-energy devotional nodes.' },
+  { title: 'Early Bird Monsoon', discount: '20% OFF ALL ROUTES', code: 'RAIN20', bg: '#f0fdf4', border: '#bbf7d0', txt: '#14532d', dtxt: '#166534', desc: 'Valid on domestic mountain treks and valley routes.' },
+  { title: 'First International', discount: 'Flat ₹5,000 OFF', code: 'FLYHIGH', bg: '#eff6ff', border: '#bfdbfe', txt: '#1e3a8a', dtxt: '#1d4ed8', desc: 'Applicable on all premier cross-border itineraries.' },
+  { title: 'Sacred Bharat Trail', discount: '15% Off Shrines', code: 'DEVOTION', bg: '#fffbeb', border: '#fde68a', txt: '#78350f', dtxt: '#b45309', desc: 'Priority pass across high-energy devotional nodes.' },
 ];
 
 const STAYS = [
-  { name:'Amanpuri Pavilions',    location:'Phuket, Thailand',  price:'₹1,20,000/Night', rating:4.9, img:'https://images.unsplash.com/photo-1566073771259-6a8506099945?w=500&auto=format&fit=crop&q=70', amenity:'Private Beach Access' },
-  { name:'Taj Mahal Palace',      location:'Mumbai, India',     price:'₹45,000/Night',   rating:5.0, img:'https://images.unsplash.com/photo-1540555700478-4be289fbecef?w=500&auto=format&fit=crop&q=70', amenity:'Sea-Facing Royal Suite' },
-  { name:'Amangiri Retreat',      location:'Utah, USA',         price:'₹2,10,000/Night', rating:4.9, img:'https://images.unsplash.com/photo-1582719508461-905c673771fd?w=500&auto=format&fit=crop&q=70', amenity:'Canyon Horizon Oasis' },
-  { name:'The Oberoi Grand',      location:'Kolkata, India',    price:'₹35,000/Night',   rating:4.8, img:'https://images.unsplash.com/photo-1585399781346-39cd7b5bf4de?w=500&auto=format&fit=crop&q=70', amenity:'Heritage Luxury Suite' },
-  { name:'Santorini Villas',      location:'Santorini, Greece', price:'₹1,80,000/Night', rating:5.0, img:'https://images.unsplash.com/photo-1570077188670-e3a8d69ac5ff?w=500&auto=format&fit=crop&q=70', amenity:'Caldera View Terrace' },
-  { name:'Leela Palace Udaipur',  location:'Udaipur, India',    price:'₹55,000/Night',   rating:4.9, img:'https://images.unsplash.com/photo-1571020614830-f3b30098d08c?w=500&auto=format&fit=crop&q=70', amenity:'Lake Palace Room' },
+  { name: 'Amanpuri Pavilions', location: 'Phuket, Thailand', price: '₹1,20,000/Night', rating: 4.9, img: 'https://images.unsplash.com/photo-1566073771259-6a8506099945?w=500&auto=format&fit=crop&q=70', amenity: 'Private Beach Access' },
+  { name: 'Taj Mahal Palace', location: 'Mumbai, India', price: '₹45,000/Night', rating: 5.0, img: 'https://images.unsplash.com/photo-1540555700478-4be289fbecef?w=500&auto=format&fit=crop&q=70', amenity: 'Sea-Facing Royal Suite' },
+  { name: 'Amangiri Retreat', location: 'Utah, USA', price: '₹2,10,000/Night', rating: 4.9, img: 'https://images.unsplash.com/photo-1582719508461-905c673771fd?w=500&auto=format&fit=crop&q=70', amenity: 'Canyon Horizon Oasis' },
+  { name: 'The Oberoi Grand', location: 'Kolkata, India', price: '₹35,000/Night', rating: 4.8, img: 'https://images.unsplash.com/photo-1585399781346-39cd7b5bf4de?w=500&auto=format&fit=crop&q=70', amenity: 'Heritage Luxury Suite' },
+  { name: 'Santorini Villas', location: 'Santorini, Greece', price: '₹1,80,000/Night', rating: 5.0, img: 'https://images.unsplash.com/photo-1570077188670-e3a8d69ac5ff?w=500&auto=format&fit=crop&q=70', amenity: 'Caldera View Terrace' },
+  { name: 'Leela Palace Udaipur', location: 'Udaipur, India', price: '₹55,000/Night', rating: 4.9, img: 'https://images.unsplash.com/photo-1571020614830-f3b30098d08c?w=500&auto=format&fit=crop&q=70', amenity: 'Lake Palace Room' },
 ];
 
 const TRANSPORT = [
-  { name:'SkyBridge Airlines', type:'Flight', price:'₹8,999', rating:4.8, img:'https://images.unsplash.com/photo-1552521514-5fefe8c9ef14?w=500&auto=format&fit=crop&q=70', amenity:'Premium Cabin',   routes:'150+ Routes' },
-  { name:'Rapid Rail Express', type:'Train',  price:'₹2,499', rating:4.7, img:'https://images.unsplash.com/photo-1570168268183-56eacde2fa16?w=500&auto=format&fit=crop&q=70', amenity:'AC First Class', routes:'280+ Routes' },
-  { name:'LuxeCoach Travels',  type:'Bus',    price:'₹1,999', rating:4.6, img:'https://images.unsplash.com/photo-1576583537228-f3ba8c7c2436?w=500&auto=format&fit=crop&q=70', amenity:'Recliner Seats', routes:'450+ Routes' },
+  { name: 'SkyBridge Airlines', type: 'Flight', price: '₹8,999', rating: 4.8, img: 'https://images.unsplash.com/photo-1552521514-5fefe8c9ef14?w=500&auto=format&fit=crop&q=70', amenity: 'Premium Cabin', routes: '150+ Routes' },
+  { name: 'Rapid Rail Express', type: 'Train', price: '₹2,499', rating: 4.7, img: 'https://images.unsplash.com/photo-1570168268183-56eacde2fa16?w=500&auto=format&fit=crop&q=70', amenity: 'AC First Class', routes: '280+ Routes' },
+  { name: 'LuxeCoach Travels', type: 'Bus', price: '₹1,999', rating: 4.6, img: 'https://images.unsplash.com/photo-1576583537228-f3ba8c7c2436?w=500&auto=format&fit=crop&q=70', amenity: 'Recliner Seats', routes: '450+ Routes' },
 ];
 
 const TESTIMONIALS = [
-  { name:'Aishwarya Roy',  location:'Mumbai',  text:'The helicopter transit maps to Kedarnath were flawlessly synchronized. The 3D flip card description matched reality perfectly.', stars:5, img:'https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=80&auto=format&fit=crop&q=70' },
-  { name:'Marcus Vance',   location:'London',  text:'Booking our Kyoto Zen path through Traveloop was unmatched. Clean UI, exceptional support, and great transparency on regional facts.', stars:5, img:'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=80&auto=format&fit=crop&q=70' },
-  { name:'Dr. Vikram Mehta',location:'Delhi',  text:'Highly fluid engine. The live budget trackers instantly unlocked customized routes without any hidden overhead steps.', stars:5, img:'https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=80&auto=format&fit=crop&q=70' },
+  { name: 'Aishwarya Roy', location: 'Mumbai', text: 'The helicopter transit maps to Kedarnath were flawlessly synchronized. The 3D flip card description matched reality perfectly.', stars: 5, img: 'https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=80&auto=format&fit=crop&q=70' },
+  { name: 'Marcus Vance', location: 'London', text: 'Booking our Kyoto Zen path through Traveloop was unmatched. Clean UI, exceptional support, and great transparency on regional facts.', stars: 5, img: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=80&auto=format&fit=crop&q=70' },
+  { name: 'Dr. Vikram Mehta', location: 'Delhi', text: 'Highly fluid engine. The live budget trackers instantly unlocked customized routes without any hidden overhead steps.', stars: 5, img: 'https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=80&auto=format&fit=crop&q=70' },
 ];
 
 const MEMORY_IMGS = [
-  { img:'https://images.unsplash.com/photo-1483684446660-706fdc82875f?w=700&auto=format&fit=crop&q=70', title:'Alpine Pass Treks', span:'row-span-2' },
-  { img:'https://images.unsplash.com/photo-1539635278303-d4002c07eae3?w=700&auto=format&fit=crop&q=70', title:'Global Collectives', span:'' },
-  { img:'https://images.unsplash.com/photo-1469854523086-cc02fe5d8800?w=700&auto=format&fit=crop&q=70', title:'Desert Expeditions', span:'row-span-2' },
-  { img:'https://images.unsplash.com/photo-1506929562872-bb421503ef21?w=700&auto=format&fit=crop&q=70', title:'Hidden Lagoons', span:'' },
-  { img:'https://images.unsplash.com/photo-1527631746610-bca00a040d60?w=700&auto=format&fit=crop&q=70', title:'Coastal Walkways', span:'col-span-2' },
+  { img: 'https://images.unsplash.com/photo-1483684446660-706fdc82875f?w=700&auto=format&fit=crop&q=70', title: 'Alpine Pass Treks', span: 'row-span-2' },
+  { img: 'https://images.unsplash.com/photo-1539635278303-d4002c07eae3?w=700&auto=format&fit=crop&q=70', title: 'Global Collectives', span: '' },
+  { img: 'https://images.unsplash.com/photo-1469854523086-cc02fe5d8800?w=700&auto=format&fit=crop&q=70', title: 'Desert Expeditions', span: 'row-span-2' },
+  { img: 'https://images.unsplash.com/photo-1506929562872-bb421503ef21?w=700&auto=format&fit=crop&q=70', title: 'Hidden Lagoons', span: '' },
+  { img: 'https://images.unsplash.com/photo-1527631746610-bca00a040d60?w=700&auto=format&fit=crop&q=70', title: 'Coastal Walkways', span: 'col-span-2' },
 ];
 
 /* ─── Section header helper ─── */
@@ -118,21 +118,21 @@ const Stars = ({ n }) => (
 const LandingPage = () => {
   const navigate = useNavigate();
 
-  const [query, setQuery]       = useState('');
-  const [scope, setScope]       = useState('All');
-  const [type, setType]         = useState('All');
-  const [budget, setBudget]     = useState(200000);
-  const [flipped, setFlipped]   = useState(null);
-  const [wish, setWish]         = useState([]);
-  const [visible, setVisible]   = useState(8);
-  const [formLoc, setFormLoc]   = useState('');
+  const [query, setQuery] = useState('');
+  const [scope, setScope] = useState('All');
+  const [type, setType] = useState('All');
+  const [budget, setBudget] = useState(200000);
+  const [flipped, setFlipped] = useState(null);
+  const [wish, setWish] = useState([]);
+  const [visible, setVisible] = useState(8);
+  const [formLoc, setFormLoc] = useState('');
   const [formTier, setFormTier] = useState('Luxury');
 
   const filtered = useMemo(() => DESTINATIONS.filter(d => {
     const q = query.toLowerCase();
-    const txt  = d.city.toLowerCase().includes(q) || d.region.toLowerCase().includes(q);
-    const sc   = scope === 'All' || d.scope === scope;
-    const tp   = type === 'All' || d.type === type;
+    const txt = d.city.toLowerCase().includes(q) || d.region.toLowerCase().includes(q);
+    const sc = scope === 'All' || d.scope === scope;
+    const tp = type === 'All' || d.type === type;
     const price = parseInt(d.price.replace(/[^\d]/g, ''), 10) || 0;
     return txt && sc && tp && price <= budget;
   }), [query, scope, type, budget]);
@@ -486,41 +486,103 @@ const LandingPage = () => {
       </section>
 
       {/* ══════════ TRANSPORT ══════════ */}
-      <section id="transport" style={{ padding: `40px ${PX}`, background: '#f8fafc', borderTop: '1px solid #f1f5f9' }}>
-        <div style={{ maxWidth: MAX, margin: '0 auto' }}>
-          <SectionHead eyebrow="Journey Options" title="Book Transportation" sub="Flights, trains, and premium coaches with real-time availability." />
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3,1fr)', gap: 16 }}>
-            {TRANSPORT.map((t, i) => (
-              <div key={i} style={{ background: '#fff', border: '1px solid #e2e8f0', borderRadius: 20, overflow: 'hidden', boxShadow: '0 2px 8px rgba(0,0,0,0.05)', transition: 'all .25s' }}
-                onMouseEnter={e => { e.currentTarget.style.transform = 'translateY(-3px)'; e.currentTarget.style.boxShadow = '0 12px 28px rgba(0,0,0,0.1)'; }}
-                onMouseLeave={e => { e.currentTarget.style.transform = 'none'; e.currentTarget.style.boxShadow = '0 2px 8px rgba(0,0,0,0.05)'; }}>
-                <div style={{ height: 170, overflow: 'hidden', position: 'relative' }}>
-                  <img src={t.img} alt={t.name} loading="lazy" style={{ width: '100%', height: '100%', objectFit: 'cover', transition: 'transform .5s' }}
-                    onMouseEnter={e => e.currentTarget.style.transform = 'scale(1.05)'}
-                    onMouseLeave={e => e.currentTarget.style.transform = 'none'} />
-                  <span style={{ position: 'absolute', top: 10, right: 10, padding: '3px 9px', background: 'rgba(255,255,255,0.92)', borderRadius: 7, fontSize: 9, fontWeight: 800, color: '#2563eb', textTransform: 'uppercase', letterSpacing: '0.1em' }}>{t.type}</span>
-                  <span style={{ position: 'absolute', bottom: 10, left: 10, padding: '3px 9px', background: 'rgba(37,99,235,0.9)', borderRadius: 7, fontSize: 9, fontWeight: 800, color: '#fff', textTransform: 'uppercase', letterSpacing: '0.08em' }}>{t.amenity}</span>
+      <section id="transport" className="py-16 px-6 md:px-16 bg-slate-50 border-t border-slate-100">
+        <div className="max-w-7xl mx-auto">
+
+          <SectionHead
+            eyebrow="Journey Options"
+            title="Book Transportation"
+            sub="Flights, trains, and premium coaches with real-time availability."
+          />
+
+          {/* Responsive Modern Grid - Auto adjusting layout */}
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 mt-10">
+            {[
+              {
+                name: 'Sky High Vectors',
+                type: 'Aviation',
+                amenity: 'First Class Lounge',
+                routes: '240+ Active Channels',
+                rating: '4.9',
+                price: '₹4,999',
+                img: 'https://images.unsplash.com/photo-1436491865332-7a61a109cc05?w=800&auto=format&fit=crop&q=80'
+              },
+              {
+                name: 'Track Master Express',
+                type: 'Railways',
+                amenity: 'Vande Bharat Elite',
+                routes: '580+ Broad Routes',
+                rating: '4.8',
+                price: '₹1,299',
+                img: 'https://images.unsplash.com/photo-1541417904950-b855846fe074?w=800&auto=format&fit=crop&q=80'
+              },
+              {
+                name: 'Road King Cruising',
+                type: 'Premium Bus',
+                amenity: 'Luxury Sleeper AC',
+                routes: '1200+ Active Couches',
+                rating: '4.7',
+                price: '₹799',
+                img: 'https://images.unsplash.com/photo-1544620347-c4fd4a3d5957?w=800&auto=format&fit=crop&q=80'
+              }
+            ].map((t, i) => (
+              <div
+                key={i}
+                className="bg-white border border-slate-200/80 rounded-[28px] overflow-hidden shadow-xs hover:shadow-xl hover:-translate-y-2 transition-all duration-500 flex flex-col justify-between h-full group"
+              >
+                {/* Bigger Image Framing Ecosystem with Smooth Zoom Animation */}
+                <div className="height-[200px] sm:h-[220px] overflow-hidden relative bg-slate-100">
+                  <img
+                    src={t.img}
+                    alt={t.name}
+                    loading="lazy"
+                    className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
+                  />
+                  {/* Top Right Type Tag */}
+                  <span className="absolute top-4 right-4 px-3 py-1 bg-white/95 backdrop-blur-md rounded-xl text-[9px] font-black tracking-widest text-blue-600 uppercase shadow-xs border border-slate-100">
+                    {t.type}
+                  </span>
+                  {/* Bottom Left Amenity Tag */}
+                  <span className="absolute bottom-4 left-4 px-3 py-1 bg-blue-600/90 backdrop-blur-md rounded-xl text-[9px] font-black tracking-widest text-white uppercase shadow-xs">
+                    {t.amenity}
+                  </span>
                 </div>
-                <div style={{ padding: '14px 16px' }}>
-                  <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 5 }}>
-                    <span style={{ fontSize: 10, color: '#94a3b8', fontWeight: 600 }}>{t.routes}</span>
-                    <div style={{ display: 'flex', alignItems: 'center', gap: 3 }}>
-                      <Star size={11} fill="#f59e0b" color="#f59e0b" />
-                      <span style={{ fontSize: 11, fontWeight: 800, color: '#0f172a' }}>{t.rating}</span>
+
+                {/* Card Content Data Hub */}
+                <div className="p-6 flex-1 flex flex-col justify-between space-y-4 text-left">
+                  <div className="space-y-1">
+                    <div className="flex justify-between items-center">
+                      <span className="text-[10px] font-black uppercase tracking-widest text-slate-400">
+                        {t.routes}
+                      </span>
+                      <div className="flex items-center gap-0.5 font-bold text-amber-500 text-[11px] bg-amber-50 px-2 py-0.5 rounded-lg border border-amber-200/40">
+                        <Star size={11} fill="currentColor" /> <span>{t.rating}</span>
+                      </div>
                     </div>
+                    <h3 className="text-xl font-black text-slate-900 tracking-tight leading-snug group-hover:text-blue-600 transition-colors">
+                      {t.name}
+                    </h3>
                   </div>
-                  <h3 style={{ fontSize: 15, fontWeight: 800, color: '#0f172a', margin: '0 0 10px', letterSpacing: '-0.01em' }}>{t.name}</h3>
-                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', paddingTop: 10, borderTop: '1px solid #f1f5f9' }}>
+
+                  {/* Price Config & Button Trigger */}
+                  <div className="pt-4 border-t border-slate-100 flex items-center justify-between">
                     <div>
-                      <p style={{ fontSize: 9, color: '#94a3b8', fontWeight: 700, textTransform: 'uppercase', margin: 0, letterSpacing: '0.1em' }}>From</p>
-                      <p style={{ fontSize: 14, fontWeight: 900, color: '#0f172a', margin: '2px 0 0', fontFamily: 'monospace' }}>{t.price}</p>
+                      <p className="text-[9px] text-slate-400 uppercase font-black tracking-wider">Starting From</p>
+                      <p className="text-xl font-mono font-black text-slate-900 mt-0.5">{t.price}</p>
                     </div>
-                    <button onClick={() => alert(`Booking ${t.name}`)} style={{ padding: '7px 14px', background: '#eff6ff', border: '1px solid #bfdbfe', borderRadius: 8, fontSize: 10, fontWeight: 700, color: '#2563eb', cursor: 'pointer', textTransform: 'uppercase', letterSpacing: '0.06em' }}>Book Ride</button>
+                    <button
+                      onClick={() => alert(`Initializing booking matrix loop for ${t.name}`)}
+                      className="px-5 py-2.5 bg-blue-50 hover:bg-blue-600 border border-blue-200/60 text-blue-600 hover:text-white rounded-xl text-xs font-black uppercase tracking-wider transition-all cursor-pointer shadow-2xs active:scale-95"
+                    >
+                      Book Ride
+                    </button>
                   </div>
                 </div>
+
               </div>
             ))}
           </div>
+
         </div>
       </section>
 
