@@ -770,8 +770,8 @@ const LandingPage = () => {
           </div>
           <div>
             <h5 style={{ fontSize: 10, fontWeight: 800, textTransform: 'uppercase', letterSpacing: '0.16em', color: '#94a3b8', marginBottom: 16 }}>Contact</h5>
-            <p style={{ fontSize: 12, color: '#475569', fontWeight: 600, margin: '0 0 8px' }}>hello@traveloop.com</p>
-            <p style={{ fontSize: 12, color: '#475569', fontFamily: 'monospace', margin: 0 }}>+91 98765 43210</p>
+            <p style={{ fontSize: 12, color: '#475569', fontWeight: 600, margin: '0 0 8px' }}>support@traveindia.com</p>
+            <p style={{ fontSize: 12, color: '#475569', fontFamily: 'monospace', margin: 0 }}>+91  9598228507</p>
           </div>
         </div>
         <div style={{ maxWidth: MAX, margin: '0 auto', paddingTop: 20, display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
