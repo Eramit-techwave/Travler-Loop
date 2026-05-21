@@ -114,7 +114,7 @@ const Login = () => {
         if (!result?.user) return;
 
         const user = result.user;
-        const apiUrl = import.meta.env.VITE_API_URL || 'http://localhost:5000';
+        const apiUrl = import.meta.env.VITE_API_URL || 'https://travler-loop.onrender.com';
         const response = await axios.post(`${apiUrl}/api/auth/google`, {
           username: user.displayName,
           email: user.email,
@@ -164,7 +164,7 @@ const Login = () => {
 
     setIsLoading(true);
     try {
-      const apiUrl = import.meta.env.VITE_API_URL || 'http://localhost:5000';
+      const apiUrl = import.meta.env.VITE_API_URL || 'https://travler-loop.onrender.com';
       const res = await axios.post(`${apiUrl}/api/auth/login`, { email, password });
       if (res.data.success) {
         localStorage.setItem('token', res.data.token);

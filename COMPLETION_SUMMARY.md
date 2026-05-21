@@ -142,7 +142,7 @@ npm run dev
 
 ### Access Points
 - **Frontend**: http://localhost:5173
-- **Backend**: http://localhost:5000
+- **Backend**: https://travler-loop.onrender.com
 - **Database**: mongodb://127.0.0.1:27017/traveloopDB
 
 ---
@@ -237,7 +237,7 @@ NODE_ENV=development
 
 ### Frontend (.env.local)
 ```
-VITE_API_URL=http://localhost:5000
+VITE_API_URL=https://travler-loop.onrender.com
 VITE_FIREBASE_API_KEY=AIzaSyBW2K1T17efLvjSyVUAuH6DrXReeP_fCt4
 ```
 

@@ -40,7 +40,7 @@ echo ========================================
 echo ✅ ALL SERVERS STARTED
 echo ========================================
 echo.
-echo Backend:  http://localhost:5000
+echo Backend:  https://travler-loop.onrender.com
 echo Frontend: http://localhost:5173
 echo.
 echo Press any key to continue...

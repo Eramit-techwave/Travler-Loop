@@ -87,7 +87,7 @@
    ```bash
    npm start
    ```
-   Server will run at: `http://localhost:5000`
+   Server will run at: `https://travler-loop.onrender.com`
 
 ### Frontend Setup
 
@@ -103,7 +103,7 @@
 
 3. **Create .env.local file** (already created):
    ```
-   VITE_API_URL=http://localhost:5000
+   VITE_API_URL=https://travler-loop.onrender.com
    VITE_FIREBASE_API_KEY=AIzaSyBW2K1T17efLvjSyVUAuH6DrXReeP_fCt4
    ```
 

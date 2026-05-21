@@ -55,7 +55,7 @@ const Signup = () => {
 
     setIsLoading(true);
     try {
-      const response = await axios.post('http://localhost:5000/api/auth/register', formData);
+      const response = await axios.post('https://travler-loop.onrender.com/api/auth/register', formData);
       if (response.data.success) {
         alert('Account created successfully');
         navigate('/login');

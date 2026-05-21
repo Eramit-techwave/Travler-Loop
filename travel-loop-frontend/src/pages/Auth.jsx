@@ -184,7 +184,7 @@ const handleAction = async (e) => {
   setIsLoading(true);
 
   const path = isLogin ? 'login' : 'register';
-  const apiUrl = import.meta.env.VITE_API_URL || 'http://localhost:5000';
+  const apiUrl = import.meta.env.VITE_API_URL || 'https://travler-loop.onrender.com';
   const finalURL = `${apiUrl}/api/auth/${path}`;
 
   try {

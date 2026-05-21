@@ -75,7 +75,7 @@ const Dashboard = () => {
       const token = localStorage.getItem('token');
       if (!token) return;
 
-      const apiUrl = import.meta.env.VITE_API_URL || 'http://localhost:5000';
+      const apiUrl = import.meta.env.VITE_API_URL || 'https://travler-loop.onrender.com';
       const response = await axios.get(`${apiUrl}/api/trips/my-trips`, {
         headers: { Authorization: `Bearer ${token}` }
       });
@@ -153,7 +153,7 @@ const Dashboard = () => {
         totalBudget: Number(bookingData.budget) || 0
       };
 
-      const apiUrl = import.meta.env.VITE_API_URL || 'http://localhost:5000';
+      const apiUrl = import.meta.env.VITE_API_URL || 'https://travler-loop.onrender.com';
       const response = await axios.post(`${apiUrl}/api/trips/add`, tripPayload, {
         headers: { Authorization: `Bearer ${token}` }
       });
@@ -178,7 +178,7 @@ const Dashboard = () => {
     if (window.confirm('Are you sure you want to delete this trip?')) {
       try {
         const token = localStorage.getItem('token');
-        const apiUrl = import.meta.env.VITE_API_URL || 'http://localhost:5000';
+        const apiUrl = import.meta.env.VITE_API_URL || 'https://travler-loop.onrender.com';
         await axios.delete(`${apiUrl}/api/trips/${tripId}`, {
           headers: { Authorization: `Bearer ${token}` }
         });
