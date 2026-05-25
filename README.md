@@ -67,7 +67,7 @@
 
 1. **Navigate to backend directory**:
    ```bash
-   cd Travel-loop
+   cd TravelIndia
    ```
 
 2. **Install dependencies**:
@@ -93,7 +93,7 @@
 
 1. **Navigate to frontend directory**:
    ```bash
-   cd travel-loop-frontend
+   cd TravelIndia-frontend
    ```
 
 2. **Install dependencies**:
@@ -152,7 +152,7 @@
 
 ```
 Travel-Project/
-├── Travel-loop/                 # Backend
+├── TravelIndia/                 # Backend
 │   ├── controllers/
 │   ├── middleware/
 │   ├── models/
@@ -161,7 +161,7 @@ Travel-Project/
 │   ├── index.js
 │   └── package.json
 │
-└── travel-loop-frontend/        # Frontend
+└── TravelIndia-frontend/        # Frontend
     ├── src/
     │   ├── pages/
     │   │   ├── LandingPage.jsx
@@ -273,7 +273,7 @@ Travel-Project/
 - CORS is enabled for localhost:3000 and localhost:5173
 - JWT tokens expire in 1 day
 - Database is set to local MongoDB (can be changed to MongoDB Atlas in production)
-- Firebase project configured for travel-loop
+- Firebase project configured for TravelIndia
 
 ---
 

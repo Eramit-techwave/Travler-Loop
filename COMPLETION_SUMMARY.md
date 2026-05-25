@@ -128,14 +128,14 @@ start.bat
 
 **Terminal 1 - Backend:**
 ```bash
-cd Travel-loop
+cd TravelIndia
 npm install  # (if needed)
 npm start
 ```
 
 **Terminal 2 - Frontend:**
 ```bash
-cd travel-loop-frontend
+cd TravelIndia-frontend
 npm install  # (if needed)
 npm run dev
 ```
