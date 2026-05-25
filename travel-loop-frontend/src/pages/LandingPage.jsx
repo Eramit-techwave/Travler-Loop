@@ -775,7 +775,7 @@ const LandingPage = () => {
           </div>
         </div>
         <div style={{ maxWidth: MAX, margin: '0 auto', paddingTop: 20, display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-          <p style={{ fontSize: 10, color: '#475569', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.1em', margin: 0 }}>© 2026 Traveloop Core. Crafted and hosted by Mr.Amit Dubey , Contact Number : 9598288507</p>
+          <p style={{ fontSize: 10, color: '#475569', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.1em', margin: 0 }}>© 2026 TraveIndia core. Crafted and hosted by Mr.Amit Dubey , Contact Number : 9598288507</p>
           <div style={{ display: 'flex', gap: 14 }}>
             {[Globe, ShieldCheck, Headset].map((Icon, i) => (
               <Icon key={i} size={16} color="#475569" style={{ cursor: 'pointer', transition: 'color .2s' }}
