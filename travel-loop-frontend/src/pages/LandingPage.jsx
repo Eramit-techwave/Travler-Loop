@@ -167,7 +167,7 @@ const LandingPage = () => {
           <div style={{ width: 36, height: 36, background: '#2563eb', borderRadius: 10, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
             <Plane size={17} color="#fff" style={{ transform: 'rotate(45deg)' }} />
           </div>
-          <span style={{ fontWeight: 900, fontSize: 15, letterSpacing: '-0.02em', color: '#0f172a', textTransform: 'uppercase' }}>TRAVE-INDIA</span>
+          <span style={{ fontWeight: 900, fontSize: 15, letterSpacing: '-0.02em', color: '#0f172a', textTransform: 'uppercase' }}>TRAVEL-INDIA</span>
         </div>
 
         <div style={{ display: 'flex', gap: 28, alignItems: 'center' }}>
