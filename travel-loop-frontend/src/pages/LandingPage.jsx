@@ -6,7 +6,6 @@ import {
   SlidersHorizontal, Send, ArrowUpRight, Hotel, RotateCcw
 } from 'lucide-react';
 
-/* ─── 3D flip + utility CSS ─── */
 const STYLE = `
   .preserve-3d { transform-style: preserve-3d; }
   .backface-hidden { backface-visibility: hidden; -webkit-backface-visibility: hidden; }
