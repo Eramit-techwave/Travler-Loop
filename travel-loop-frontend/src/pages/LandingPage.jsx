@@ -418,8 +418,7 @@ const LandingPage = () => {
           </div>
         )}
       </section>
-
-      {/* ══════════ MEMORIES MOSAIC ══════════ */}
+      
      {/* ══════════ SOCIAL GRID LOGS (EMOTIONAL CHRONICLES) ══════════ */}
 <section id="memories" className="py-24 px-6 md:px-16 bg-slate-50 border-y border-slate-200/60">
   <div className="max-w-7xl mx-auto">
