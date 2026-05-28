@@ -756,7 +756,7 @@ const LandingPage = () => {
               <div style={{ width: 32, height: 32, background: '#2563eb', borderRadius: 8, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
                 <Plane size={15} color="#fff" style={{ transform: 'rotate(45deg)' }} />
               </div>
-              <span style={{ fontWeight: 900, fontSize: 14, color: '#fff', textTransform: 'uppercase', letterSpacing: '-0.01em' }}>TRAVEINDIA</span>
+              <span style={{ fontWeight: 900, fontSize: 14, color: '#fff', textTransform: 'uppercase', letterSpacing: '-0.01em' }}>TRAVELINDIA</span>
             </div>
             <p style={{ fontSize: 12, color: '#64748b', lineHeight: 1.6, maxWidth: 280, margin: 0 }}>Transforming luxury travel planning into a seamless digital experience. Curated by Amit Dubey.</p>
           </div>
