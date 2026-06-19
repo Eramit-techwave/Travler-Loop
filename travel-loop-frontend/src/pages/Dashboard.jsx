@@ -208,7 +208,7 @@ const Dashboard = () => {
             <div className="bg-slate-950 p-2.5 rounded-xl text-white shadow-md">
               <Plane className="w-5 h-5 rotate-45" />
             </div>
-            <span className="text-lg font-black tracking-widest text-slate-950 hidden sm:block">TRAVELOOP</span>
+            <span className="text-lg font-black tracking-widest text-slate-950 hidden sm:block">TRAVEINDIA</span>
           </div>
 
           <div className="h-6 w-px bg-slate-200 hidden sm:block" />
@@ -224,7 +224,7 @@ const Dashboard = () => {
             }`}
           >
             {isNavOpen ? <X className="w-4 h-4 text-indigo-400" /> : <Menu className="w-4 h-4 text-indigo-600" />}
-            <span>Main Navigation</span>
+            <span>Menu</span>
           </button>
 
           {/* FLOATING DROPDOWN LIST CONTAINER */}
