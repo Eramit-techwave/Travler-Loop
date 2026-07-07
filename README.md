@@ -1,14 +1,7 @@
 # Travel- INDIA Project - Complete Setup Guide WHAT,HOW,WHERE,WHEN,WHY EVERYTHING IS MENTION IN THIS README FILE -->>
 
 ## 🚀 Project Status: FULLY FUNCTIONAL ✅
-d
 
-### Frontend Server: Running ✅
-- **Port**: 5173
-- **Framework**: React + Vite
-- **Status**: All pages and components configured
-
----
 
 ## 📋 Features Implemented
 
@@ -50,40 +43,6 @@ d
 - [x] Notification Alerts
 - [x] Trip Statistics Display
 
----
-
-## 🛠️ Setup Instructions
-
-### Prerequisites
-- Node.js (v14+)
-- MongoDB (local or cloud instance)
-- npm or yarn
-
-### Backend Setup
-
-1. **Navigate to backend directory**:
-   ```bash
-   cd TravelIndia
-   ```
-
-2. **Install dependencies**:
-   ```bash
-   npm install
-   ```
-
-3. **Create .env file** (already created):
-   ```
-   PORT=5000
-   MONGODB_URI=mongodb://127.0.0.1:27017/traveloopDB
-   JWT_SECRET=traveloop_secret_key
-   NODE_ENV=development
-   ```
-
-4. **Start the server**:
-   ```bash
-   npm start
-   ```
-   Server will run at: `https://travler-loop.onrender.com`
 
 ### Frontend Setup
 
@@ -96,18 +55,6 @@ d
    ```bash
    npm install
    ```
-
-3. **Create .env.local file** (already created):
-   ```
-   VITE_API_URL=https://travler-loop.onrender.com
-   VITE_FIREBASE_API_KEY=AIzaSyBW2K1T17efLvjSyVUAuH6DrXReeP_fCt4
-   ```
-
-4. **Start dev server**:
-   ```bash
-   npm run dev
-   ```
-   App will run at: `http://localhost:5173`
 
 ---
 
