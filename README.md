@@ -54,8 +54,6 @@
 
 ---
 
-## 🔑 Key Technologies
-
 ### Backend
 - **Node.js + Express** - Server framework
 - **MongoDB + Mongoose** - Database
@@ -150,10 +148,6 @@ Travel-Project/
 ---
 
 ## 🧪 Testing the App
-
-1. **Open in browser**: http://localhost:5173
-2. **Test Registration**:
-   - Click "Sign Up"
    - Fill form with test credentials
    - Click "Create Account"
    - Should redirect to login page
