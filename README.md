@@ -43,19 +43,6 @@
 - [x] Notification Alerts
 - [x] Trip Statistics Display
 
-
-### Frontend Setup
-
-1. **Navigate to frontend directory**:
-   ```bash
-   cd TravelIndia-frontend
-   ```
-
-2. **Install dependencies**:
-   ```bash
-   npm install
-   ``
-
 ### Authentication
 - `POST /api/auth/register` - Register new user
 - `POST /api/auth/login` - Login user
