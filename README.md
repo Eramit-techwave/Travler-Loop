@@ -177,13 +177,13 @@ Travel-Project/
 - **CORS errors**: Check that frontend URL is allowed in index.js
 
 ### Frontend Issues
-- **API calls failing**: Ensure backend is running and VITE_API_URL is correct
-- **Firebase config issues**: Check firebaseConfig.js has correct credentials
-- **Components not rendering**: Clear cache with `npm run dev -- --reset`
+- **API calls failing**: 
+- **Firebase config issues**
+- **Components not rendering**: 
 
 ### General Issues
-- **"Cannot find module"**: Run `npm install` in the respective directory
-- **Port conflicts**: Use `lsof -i :PORT` (macOS/Linux) or `netstat -ano | findstr :PORT` (Windows)
+- **"Cannot find module"**:
+- **Port conflicts**
 
 ---
 
